@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  This file is part of the tock-corenlp distribution.
+  ~  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+  ~  Copyright (c) 2017 VSCT.
+  ~
+  ~  tock-corenlp is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as
+  ~  published by the Free Software Foundation, version 3.
+  ~
+  ~  tock-corenlp is distributed in the hope that it will be useful, but
+  ~  WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~  General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fr.vsct.tock</groupId>
+        <artifactId>tock-nlp-model</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tock-nlp-model-stanford</artifactId>
+
+    <properties>
+        <stanford>3.7.0</stanford>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>fr.vsct.tock</groupId>
+            <artifactId>tock-nlp-model-service</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>${stanford}</version>
+        </dependency>
+
+
+    </dependencies>
+
+</project>

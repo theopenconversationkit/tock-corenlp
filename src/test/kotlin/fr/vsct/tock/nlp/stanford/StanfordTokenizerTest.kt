@@ -1,0 +1,76 @@
+/*
+ *  This file is part of the tock-corenlp distribution.
+ *  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+ *  Copyright (c) 2017 VSCT.
+ *
+ *  tock-corenlp is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as
+ *  published by the Free Software Foundation, version 3.
+ *
+ *  tock-corenlp is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package fr.vsct.tock.nlp.stanford
+
+import fr.vsct.tock.nlp.core.NlpEngineType
+import fr.vsct.tock.nlp.model.TokenizerContext
+import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import fr.vsct.tock.nlp.stanford.StanfordTokenizer
+import org.junit.Test
+import java.util.Locale
+import kotlin.test.assertEquals
+
+/**
+ *
+ */
+internal class StanfordTokenizerTest {
+
+    val tokenizer = StanfordTokenizer(TokenizerModelHolder(Locale.FRENCH))
+    val context = TokenizerContext(Locale.FRENCH, NlpEngineType.Companion.stanford)
+
+    @Test
+    fun tokenize_wordsWithDash_areSplitted() {
+        val tokens = tokenizer.tokenize(context, "Paris-Lyon du 25 au 28 Février")
+        assertEquals("Paris", tokens[0])
+        assertEquals("Lyon", tokens[2])
+        assertEquals(8, tokens.size)
+    }
+
+    @Test
+    fun tokenize_wordsWithSimpleQuote_areSplitted() {
+        val tokens = tokenizer.tokenize(context, "Cap d'Agde")
+        assertEquals("Cap", tokens[0])
+        assertEquals("d", tokens[1])
+        assertEquals("'", tokens[2])
+        assertEquals("Agde", tokens[3])
+        assertEquals(4, tokens.size)
+    }
+
+    //TODO improve this one
+    @Test
+    fun tokenize_specialChar_splitInOneToken() {
+        val tokens = tokenizer.tokenize(context, "😀")
+        assertEquals(1, tokens.size)
+        assertEquals("😀", tokens[0])
+    }
+
+    @Test
+    fun tokenize_twoSpecialChars_splitInOneToken() {
+        val tokens = tokenizer.tokenize(context, "😀 😀")
+        assertEquals(1, tokens.size)
+        assertEquals("😀 😀", tokens[0])
+    }
+
+    @Test
+    fun tokenize_twoSpecialCharsAndClassicWord_splitInOneToken() {
+        val tokens = tokenizer.tokenize(context, "😀😀 Paris")
+        assertEquals(1, tokens.size)
+        assertEquals("Paris", tokens[0])
+    }
+}

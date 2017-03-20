@@ -1,0 +1,64 @@
+map=word=0,answer=1
+useGenericFeatures=true
+useWord=true
+useNGrams=true
+#Better results without mid words features -> noMidNGrams=true
+noMidNGrams=true
+#Optimum for maxNGramLeng is between 15 and 18
+maxNGramLeng=18
+usePrev=true
+useNext=true
+useSequences=true
+usePrevSequences=true
+maxLeft=1
+useTypeSeqs=true
+useTypeSeqs2=true
+useTypeySequences=true
+
+# better performance and same accuracy when true
+useObservedSequencesOnly=true
+
+#same performance and same/worse results when true
+saveFeatureIndexToDisk=false
+
+# almost same performance and better results when true
+lowercaseNGrams=true
+
+#same accuracy, slightly better performance when true
+dehyphenateNGrams=true
+
+#worse performance and same/worse accuracy when true
+conjoinShapeNGrams=false
+
+#worse accuracy and way worse performance when true
+useNeighborNGrams=false
+
+# slightly worse performance but better accuracy when true
+useTags=true
+
+# better results and slightly better performance when true
+useNextSequences=true
+
+# same results with worse performance when true
+useLongSequences=false
+
+# performance = / accuracy - when true
+useSymTags=false
+
+# performance = / accuracy = when true
+cacheNGrams=false
+
+# performance = / accuracy = when true
+useLemmas=false
+
+# performance - / accuracy = when true
+usePrevNextLemmas=false
+
+# performance = / accuracy = when true
+useLemmaAsWord=false
+
+#same accuracy worse performance when true
+useWordPairs=false
+wordShape=chris2useLC
+QNsize=10
+QNsize2=10
