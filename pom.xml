@@ -61,4 +61,20 @@
         </repository>
     </repositories>
 
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL) version 3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+            <distribution>repo</distribution>
+            <comments />
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:voyages-sncf-technologies/tock-corenlp.git</connection>
+        <developerConnection>scm:git:git@github.com:voyages-sncf-technologies/tock-corenlp.git</developerConnection>
+        <url>git@github.com:voyages-sncf-technologies/tock-corenlp.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
 </project>
