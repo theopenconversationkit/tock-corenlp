@@ -32,7 +32,7 @@ import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 /**
  *
  */
-object StanfordEngineProvider : NlpEngineProvider {
+class StanfordEngineProvider : NlpEngineProvider {
 
     override fun type(): NlpEngineType {
         return NlpEngineType.stanford
