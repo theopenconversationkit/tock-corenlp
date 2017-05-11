@@ -21,9 +21,8 @@ package fr.vsct.tock.nlp.stanford
 import fr.vsct.tock.nlp.core.NlpEngineType
 import fr.vsct.tock.nlp.model.TokenizerContext
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
-import fr.vsct.tock.nlp.stanford.StanfordTokenizer
 import org.junit.Test
-import java.util.Locale
+import java.util.*
 import kotlin.test.assertEquals
 
 /**
@@ -50,6 +49,12 @@ internal class StanfordTokenizerTest {
         assertEquals("'", tokens[2])
         assertEquals("Agde", tokens[3])
         assertEquals(4, tokens.size)
+    }
+
+    @Test
+    fun tokenize_spaceText_shouldNotFail() {
+        val tokens = tokenizer.tokenize(context, " ")
+        assertEquals(0, tokens.size)
     }
 
     //TODO improve this one

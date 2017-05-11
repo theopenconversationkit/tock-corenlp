@@ -36,7 +36,7 @@ import java.io.BufferedReader
 import java.io.StringReader
 import java.lang.StringBuilder
 import java.time.Instant
-import java.util.Properties
+import java.util.*
 
 /**
  *
@@ -81,7 +81,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         return EntityModelHolder(crfClassifier, Instant.now())
     }
 
-    private fun getEntityTrainData(context: EntityBuildContext, expressions: List<SampleExpression>): Pair<List<String>, BufferedReader> {
+    internal fun getEntityTrainData(context: EntityBuildContext, expressions: List<SampleExpression>): Pair<List<String>, BufferedReader> {
         val tokenizer = StanfordEngineProvider.getTokenizer(TokenizerModelHolder(context.language))
         val tokenizerContext = TokenizerContext(context)
         val list = mutableListOf<String>()

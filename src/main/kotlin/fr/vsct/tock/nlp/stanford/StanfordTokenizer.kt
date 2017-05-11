@@ -28,7 +28,7 @@ import fr.vsct.tock.nlp.model.service.engine.NlpTokenizer
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 import mu.KotlinLogging
 import java.io.StringReader
-import java.util.Locale
+import java.util.*
 
 /**
  *
@@ -47,11 +47,11 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
             splitSeparators(word)
         }
         if (rawTokens.isEmpty()) {
-            if (text.trim().isEmpty()) {
-                throw IllegalArgumentException("empty text")
+            rawTokens = if (text.trim().isEmpty()) {
+                emptyList()
             } else {
                 logger.warn { "empty token list for $text, do not split" }
-                rawTokens = listOf(text.trim())
+                listOf(text.trim())
             }
         }
 
