@@ -31,6 +31,7 @@ import fr.vsct.tock.nlp.model.EntityCallContextForSubEntities
 import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEntityClassifier
 import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.TAB
+import fr.vsct.tock.shared.error
 import mu.KotlinLogging
 import java.io.BufferedReader
 import java.io.StringReader
@@ -57,54 +58,59 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
     }
 
     private fun classifyEntities(context: EntityCallContextForIntent, text: String, tokens: Array<String>): List<EntityRecognition> {
-        with(model) {
-            @Suppress("UNCHECKED_CAST")
-            val classifier = nativeModel as CRFClassifier<CoreLabel>
+        return try {
+            with(model) {
+                @Suppress("UNCHECKED_CAST")
+                val classifier = nativeModel as CRFClassifier<CoreLabel>
 
-            val evaluationData = getEvaluationData(tokens)
-            val documents = classifier.makeObjectBankFromReader(evaluationData, classifier.defaultReaderAndWriter())
-            val document = documents.flatMap { it }
+                val evaluationData = getEvaluationData(tokens)
+                val documents = classifier.makeObjectBankFromReader(evaluationData, classifier.defaultReaderAndWriter())
+                val document = documents.flatMap { it }
 
-            val classifiedLabels = classifier.classify(document)
+                val classifiedLabels = classifier.classify(document)
 
-            val confidence = getConfidence(classifier, classifiedLabels)
+                val confidence = getConfidence(classifier, classifiedLabels)
 
-            val coreTokens = mutableListOf<Token>()
-            var previousToken: Token? = null
-            document.forEachIndexed {
-                index, word ->
-                var t = text
-                var start = 0
-                for (i in 0 until index) {
-                    val nextTokenIndex = document[i].word().length + t.indexOf(document[i].word())
-                    start += nextTokenIndex
-                    t = t.substring(nextTokenIndex)
-                }
-
-                start += t.indexOf(document[index].word())
-                val end = start + document[index].word().length
-
-                val entityRole = word.get(CoreAnnotations.AnswerAnnotation::class.java)
-                if (entityRole != "O") {
-                    if (previousToken?.type != entityRole) {
-                        previousToken = Token(start, end, word.word(), entityRole)
-                    } else {
-                        coreTokens.removeAt(coreTokens.lastIndex)
-                        val w = text.substring((previousToken as Token).start, end)
-                        previousToken = Token((previousToken as Token).start, end, w, entityRole)
+                val coreTokens = mutableListOf<Token>()
+                var previousToken: Token? = null
+                document.forEachIndexed {
+                    index, word ->
+                    var t = text
+                    var start = 0
+                    for (i in 0 until index) {
+                        val nextTokenIndex = document[i].word().length + t.indexOf(document[i].word())
+                        start += nextTokenIndex
+                        t = t.substring(nextTokenIndex)
                     }
 
-                    val tok = previousToken!!
+                    start += t.indexOf(document[index].word())
+                    val end = start + document[index].word().length
 
-                    coreTokens.add(Token(tok.start, tok.end, tok.text, tok.type))
-                } else {
-                    previousToken = null
+                    val entityRole = word.get(CoreAnnotations.AnswerAnnotation::class.java)
+                    if (entityRole != "O") {
+                        if (previousToken?.type != entityRole) {
+                            previousToken = Token(start, end, word.word(), entityRole)
+                        } else {
+                            coreTokens.removeAt(coreTokens.lastIndex)
+                            val w = text.substring((previousToken as Token).start, end)
+                            previousToken = Token((previousToken as Token).start, end, w, entityRole)
+                        }
+
+                        val tok = previousToken!!
+
+                        coreTokens.add(Token(tok.start, tok.end, tok.text, tok.type))
+                    } else {
+                        previousToken = null
+                    }
+                }
+
+                coreTokens.map {
+                    EntityRecognition(EntityValue(it.start, it.end, context.intent.getEntity(it.type)), confidence)
                 }
             }
-
-            return coreTokens.map {
-                EntityRecognition(EntityValue(it.start, it.end, context.intent.getEntity(it.type)), confidence)
-            }
+        } catch(e: Exception) {
+            logger.error(e)
+            emptyList()
         }
     }
 
