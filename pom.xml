@@ -23,7 +23,7 @@
     <parent>
         <groupId>fr.vsct.tock</groupId>
         <artifactId>tock-nlp-model</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2.0</version>
     </parent>
 
     <artifactId>tock-nlp-model-stanford</artifactId>
@@ -75,7 +75,7 @@
         <connection>scm:git:git@github.com:voyages-sncf-technologies/tock-corenlp.git</connection>
         <developerConnection>scm:git:git@github.com:voyages-sncf-technologies/tock-corenlp.git</developerConnection>
         <url>git@github.com:voyages-sncf-technologies/tock-corenlp.git</url>
-        <tag>HEAD</tag>
+        <tag>tock-0.2.0</tag>
     </scm>
 
 </project>
