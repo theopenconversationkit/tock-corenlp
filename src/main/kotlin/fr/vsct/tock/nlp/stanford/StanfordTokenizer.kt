@@ -69,9 +69,9 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
                         listOf(w)
                     } else {
                         val split = word.split(separator)
-                        return split.mapIndexed { index, s ->
+                        return split.mapIndexed { i, s ->
                             listOfNotNull(
-                                    if (index != 0) separator else null,
+                                    if (i != 0) separator else null,
                                     if (s.isNotEmpty()) s else null)
                         }.flatMap { it }
                     }
