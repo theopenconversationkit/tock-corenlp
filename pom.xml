@@ -23,7 +23,7 @@
     <parent>
         <groupId>fr.vsct.tock</groupId>
         <artifactId>tock-nlp-model</artifactId>
-        <version>0.2.8-SNAPSHOT</version>
+        <version>0.2.10-SNAPSHOT</version>
     </parent>
 
     <artifactId>tock-nlp-model-stanford</artifactId>
@@ -32,7 +32,7 @@
     <url>https://github.com/voyages-sncf-technologies/tock-corenlp</url>
 
     <properties>
-        <stanford>3.7.0</stanford>
+        <stanford>3.8.0</stanford>
     </properties>
 
     <dependencies>
