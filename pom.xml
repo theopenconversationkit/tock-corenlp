@@ -46,6 +46,20 @@
             <artifactId>stanford-corenlp</artifactId>
             <version>${stanford}</version>
         </dependency>
+
+        <dependency>
+            <groupId>fr.vsct.tock</groupId>
+            <artifactId>tock-nlp-integration-tests</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.vsct.tock</groupId>
+            <artifactId>tock-nlp-front-shared</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories>

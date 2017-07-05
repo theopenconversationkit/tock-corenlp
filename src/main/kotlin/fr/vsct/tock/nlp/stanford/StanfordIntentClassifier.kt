@@ -18,7 +18,6 @@
 
 package fr.vsct.tock.nlp.stanford
 
-import edu.stanford.nlp.classify.LinearClassifier
 import fr.vsct.tock.nlp.core.IntentRecognition
 import fr.vsct.tock.nlp.model.IntentContext
 import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
@@ -34,11 +33,11 @@ internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentCla
             if (!model.application.intents.isEmpty()) {
                 with(nativeModel as StanfordIntentModel) {
                     val d = cdc.makeDatumFromLine("\t$text")
-                    val intentName = classifier.classOf(d)
-                    if (intentName != null) {
-                        val counter = (classifier as LinearClassifier).probabilityOf(d)
-                        return kotlin.collections.listOf(IntentRecognition(application.getIntent(intentName), counter.getCount(intentName)))
-                    }
+                    return classifier.scoresOf(d)
+                            .entrySet()
+                            .map {
+                                IntentRecognition(application.getIntent(it.key), it.value)
+                            }
                 }
             }
             return emptyList()

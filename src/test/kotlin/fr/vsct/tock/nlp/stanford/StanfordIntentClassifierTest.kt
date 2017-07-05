@@ -1,0 +1,50 @@
+package fr.vsct.tock.nlp.stanford
+
+import fr.vsct.tock.nlp.core.Application
+import fr.vsct.tock.nlp.core.Entity
+import fr.vsct.tock.nlp.core.EntityType
+import fr.vsct.tock.nlp.core.Intent
+import fr.vsct.tock.nlp.core.NlpEngineType
+import fr.vsct.tock.nlp.integration.IntegrationConfiguration
+import fr.vsct.tock.nlp.model.IntentContext
+import fr.vsct.tock.nlp.model.TokenizerContext
+import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import org.junit.Test
+import java.util.Locale
+import kotlin.test.assertEquals
+
+
+/**
+ *
+ */
+class StanfordIntentClassifierTest {
+
+    private val language = Locale.ENGLISH
+    private val tokenizer = StanfordTokenizer(TokenizerModelHolder(language))
+
+    @Test
+    fun classifyIntent_shouldReturnsAllIntentsAvailable() {
+        val dump = IntegrationConfiguration.loadDump(NlpEngineType.stanford)
+        with(dump) {
+            val sentence = "this is a hard day"
+            val application = Application(application.name, intents.map { Intent(it.qualifiedName, it.entities.map { Entity(EntityType(it.entityTypeName), it.role) }) }, setOf(language))
+            val context = IntentContext(application, language, NlpEngineType.stanford)
+            val expressions = sentences.map { s ->
+                s.toSampleExpression(
+                        {
+                            intents.first { it._id == s.classification.intentId }
+                                    .let {
+                                        Intent(it.qualifiedName, it.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
+                                    }
+                        },
+                        { EntityType(it) }
+                )
+            }
+            val modelHolder = StanfordModelBuilder.buildIntentModel(context, expressions)
+            val classifier = StanfordIntentClassifier(modelHolder)
+            val result = classifier.classifyIntent(context, sentence, tokenizer.tokenize(TokenizerContext(context), sentence))
+
+            assertEquals(2, result.size)
+        }
+    }
+}

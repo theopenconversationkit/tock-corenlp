@@ -28,14 +28,37 @@ import fr.vsct.tock.nlp.model.service.engine.NlpTokenizer
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 import mu.KotlinLogging
 import java.io.StringReader
-import java.util.*
+import java.util.Locale
 
 /**
  *
  */
 internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(model) {
 
-    private val logger = KotlinLogging.logger {}
+    companion object {
+        private val logger = KotlinLogging.logger {}
+
+        private fun getTokenizerFactory(language: Locale): TokenizerFactory<CoreLabel> {
+            logger.trace { "getting tokenizer for : $language" }
+            return when (language.language) {
+                "fr" -> {
+                    FrenchTokenizer.FrenchTokenizerFactory.newTokenizerFactory()
+                            .also {
+                                it.setOptions("untokenizable=noneDelete")
+                            }
+                }
+                "en" -> {
+                    PTBTokenizer.PTBTokenizerFactory.newCoreLabelTokenizerFactory("")
+                }
+                "es" -> {
+                    SpanishTokenizer.SpanishTokenizerFactory.newCoreLabelTokenizerFactory()
+                }
+                else -> {
+                    PTBTokenizer.PTBTokenizerFactory.newCoreLabelTokenizerFactory("")
+                }
+            }
+        }
+    }
 
     val tokenizerFactory = getTokenizerFactory(model.language)
     val separators = arrayListOf("-", "'", "/")
@@ -86,24 +109,5 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
         return result
     }
 
-    fun getTokenizerFactory(language: Locale): TokenizerFactory<CoreLabel> {
-        logger.trace { "getting tokenizer for : $language" }
-        return when (language.language) {
-            "fr" -> {
-                FrenchTokenizer.FrenchTokenizerFactory.newTokenizerFactory()
-                        .also {
-                            it.setOptions("untokenizable=noneDelete")
-                        }
-            }
-            "en" -> {
-                PTBTokenizer.PTBTokenizerFactory.newCoreLabelTokenizerFactory("")
-            }
-            "es" -> {
-                SpanishTokenizer.SpanishTokenizerFactory.newCoreLabelTokenizerFactory()
-            }
-            else -> {
-                PTBTokenizer.PTBTokenizerFactory.newCoreLabelTokenizerFactory("")
-            }
-        }
-    }
+
 }
