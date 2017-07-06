@@ -12,6 +12,7 @@ import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 import org.junit.Test
 import java.util.Locale
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 
 /**
@@ -45,6 +46,11 @@ class StanfordIntentClassifierTest {
             val result = classifier.classifyIntent(context, sentence, tokenizer.tokenize(TokenizerContext(context), sentence))
 
             assertEquals(2, result.size)
+            val p1 = result.first().probability
+            val p2 = result.last().probability
+            assertTrue(p1 > p2)
+            assertTrue(p1 > 0 && p1 < 1)
+            assertTrue(p2 > 0 && p2 < 1)
         }
     }
 }

@@ -18,6 +18,7 @@
 
 package fr.vsct.tock.nlp.stanford
 
+import edu.stanford.nlp.stats.Counters
 import fr.vsct.tock.nlp.core.IntentRecognition
 import fr.vsct.tock.nlp.model.IntentContext
 import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
@@ -34,13 +35,22 @@ internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentCla
                 with(nativeModel as StanfordIntentModel) {
                     val d = cdc.makeDatumFromLine("\t$text")
                     return classifier.scoresOf(d)
-                            .entrySet()
-                            .map {
-                                IntentRecognition(application.getIntent(it.key), it.value)
+                            .let { counter ->
+                                Counters.logNormalizeInPlace(counter)
+                                counter.entrySet()
+                                        .map {
+                                            IntentRecognition(
+                                                    application.getIntent(it.key),
+                                                    Math.exp(it.value))
+                                        }
+                                        .sortedByDescending {
+                                            it.probability
+                                        }
                             }
                 }
             }
-            return emptyList()
         }
+        return emptyList()
     }
+
 }
