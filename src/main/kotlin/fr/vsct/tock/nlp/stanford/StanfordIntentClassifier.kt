@@ -19,7 +19,8 @@
 package fr.vsct.tock.nlp.stanford
 
 import edu.stanford.nlp.stats.Counters
-import fr.vsct.tock.nlp.core.IntentRecognition
+import fr.vsct.tock.nlp.core.Intent
+import fr.vsct.tock.nlp.core.IntentClassification
 import fr.vsct.tock.nlp.model.IntentContext
 import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpIntentClassifier
@@ -29,28 +30,44 @@ import fr.vsct.tock.nlp.model.service.engine.NlpIntentClassifier
  */
 internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentClassifier(model) {
 
-    override fun classifyIntent(context: IntentContext, text: String, tokens: Array<String>): List<IntentRecognition> {
-        with(model) {
+    companion object {
+        val emptyClassification = object : IntentClassification {
+            override fun probability(): Double = 0.0
+
+            override fun hasNext(): Boolean = false
+
+            override fun next(): Intent = throw NoSuchElementException()
+        }
+    }
+
+    override fun classifyIntent(context: IntentContext, text: String, tokens: Array<String>): IntentClassification {
+        return with(model) {
             if (!model.application.intents.isEmpty()) {
                 with(nativeModel as StanfordIntentModel) {
                     val d = cdc.makeDatumFromLine("\t$text")
-                    return classifier.scoresOf(d)
-                            .let { counter ->
-                                Counters.logNormalizeInPlace(counter)
-                                counter.entrySet()
-                                        .map {
-                                            IntentRecognition(
-                                                    application.getIntent(it.key),
-                                                    Math.exp(it.value))
-                                        }
-                                        .sortedByDescending {
-                                            it.probability
-                                        }
+                    val scores = classifier.scoresOf(d)
+                    val logSum = Counters.logSum(scores)
+                    val iterator = scores.entrySet().sortedByDescending { it.value }.iterator()
+                    return object : IntentClassification {
+
+                        var probability = 0.0
+
+                        override fun probability(): Double = probability
+
+                        override fun hasNext(): Boolean = iterator.hasNext()
+
+                        override fun next(): Intent {
+                            return iterator.next().let { (key, proba) ->
+                                probability = Math.exp(proba - logSum)
+                                application.getIntent(key)
                             }
+                        }
+                    }
                 }
+            } else {
+                emptyClassification
             }
         }
-        return emptyList()
     }
 
 }
