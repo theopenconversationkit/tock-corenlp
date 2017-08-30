@@ -52,7 +52,7 @@
             <artifactId>tock-nlp-integration-tests</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
