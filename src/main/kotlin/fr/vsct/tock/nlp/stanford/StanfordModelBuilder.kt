@@ -36,7 +36,8 @@ import java.io.BufferedReader
 import java.io.StringReader
 import java.lang.StringBuilder
 import java.time.Instant
-import java.util.*
+import java.util.Properties
+import java.util.stream.Collectors
 
 /**
  *
@@ -74,11 +75,16 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
     override fun buildEntityModel(context: EntityBuildContext, expressions: List<SampleExpression>): EntityModelHolder {
         val crfClassifier = CRFClassifier<CoreLabel>(entityClassifierProperties())
         val trainingData = getEntityTrainData(context, expressions)
-        val transformedData: ObjectBank<MutableList<CoreLabel>> = crfClassifier.makeObjectBankFromReader(
-                trainingData.second,
-                crfClassifier.defaultReaderAndWriter())
-        crfClassifier.train(transformedData)
-        return EntityModelHolder(crfClassifier, Instant.now())
+        try {
+            val transformedData: ObjectBank<MutableList<CoreLabel>> = crfClassifier.makeObjectBankFromReader(
+                    trainingData.second,
+                    crfClassifier.defaultReaderAndWriter())
+            crfClassifier.train(transformedData)
+            return EntityModelHolder(crfClassifier, Instant.now())
+        } catch (e: Exception) {
+            logger.error { "error with train data: \n ${getEntityTrainData(context, expressions).second.lines().collect(Collectors.joining("\n"))}" }
+            throw e
+        }
     }
 
     internal fun getEntityTrainData(context: EntityBuildContext, expressions: List<SampleExpression>): Pair<List<String>, BufferedReader> {
@@ -86,16 +92,14 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         val tokenizerContext = TokenizerContext(context)
         val list = mutableListOf<String>()
         val sb = StringBuilder()
-        expressions.forEach {
-            expression ->
+        expressions.forEach { expression ->
             val text = expression.text
-            if (text.contains("\n")) {
-                logger.warn { "expression $text contains \\n!!! - skipped" }
+            if (text.contains("\n") || text.contains("\t")) {
+                logger.warn { "expression $text contains \\n or \\t!!! - skipped" }
                 return@forEach
             }
             val tokens = tokenizer.tokenize(tokenizerContext, text)
-            val tokenMap = expression.entities.map {
-                e ->
+            val tokenMap = expression.entities.map { e ->
                 val start = if (e.start == 0) 0 else tokenizer.tokenize(tokenizerContext, text.substring(0, e.start)).size
                 val end = start + tokenizer.tokenize(tokenizerContext, text.substring(e.start, e.end)).size
                 if (start >= tokens.size || end > tokens.size) {
@@ -107,8 +111,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                 }
             }.flatMap { it }.toMap()
 
-            tokens.forEach {
-                token ->
+            tokens.forEach { token ->
                 val entity = tokenMap.get(token)
                 if (entity != null) {
                     sb.appendln("${token}${TAB}${entity.role}")
