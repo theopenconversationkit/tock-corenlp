@@ -61,7 +61,7 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
     }
 
     val tokenizerFactory = getTokenizerFactory(model.language)
-    val separators = arrayListOf("-", "'", "/")
+    val separators = arrayListOf("-", "'", "/", " ")
 
     override fun tokenize(context: TokenizerContext, text: String): Array<String> {
         var rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap {
