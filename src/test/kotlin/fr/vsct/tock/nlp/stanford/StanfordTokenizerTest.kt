@@ -22,7 +22,7 @@ import fr.vsct.tock.nlp.core.NlpEngineType
 import fr.vsct.tock.nlp.model.TokenizerContext
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 import org.junit.Test
-import java.util.*
+import java.util.Locale
 import kotlin.test.assertEquals
 
 /**
@@ -77,5 +77,14 @@ internal class StanfordTokenizerTest {
         val tokens = tokenizer.tokenize(context, "😀😀 Paris")
         assertEquals(1, tokens.size)
         assertEquals("Paris", tokens[0])
+    }
+
+    @Test
+    fun tokenize_StringWithSharp_shouldSplitTokens() {
+        val tokens = tokenizer.tokenize(context, "#zea1")
+        assertEquals(3, tokens.size)
+        assertEquals("#", tokens[0])
+        assertEquals("zea", tokens[1])
+        assertEquals("1", tokens[2])
     }
 }

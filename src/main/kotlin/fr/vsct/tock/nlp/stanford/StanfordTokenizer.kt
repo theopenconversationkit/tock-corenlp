@@ -26,6 +26,7 @@ import edu.stanford.nlp.process.TokenizerFactory
 import fr.vsct.tock.nlp.model.TokenizerContext
 import fr.vsct.tock.nlp.model.service.engine.NlpTokenizer
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import fr.vsct.tock.shared.listProperty
 import mu.KotlinLogging
 import java.io.StringReader
 import java.util.Locale
@@ -37,6 +38,7 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
 
     companion object {
         private val logger = KotlinLogging.logger {}
+        private val separators: List<String> = listProperty("tock_stanford_tokens_separators", listOf("-", "'", "/", " ", "#"))
 
         private fun getTokenizerFactory(language: Locale): TokenizerFactory<CoreLabel> {
             logger.trace { "getting tokenizer for : $language" }
@@ -61,11 +63,9 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
     }
 
     val tokenizerFactory = getTokenizerFactory(model.language)
-    val separators = arrayListOf("-", "'", "/", " ")
 
     override fun tokenize(context: TokenizerContext, text: String): Array<String> {
-        var rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap {
-            coreLabel ->
+        var rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
             val word = coreLabel.word()
             splitSeparators(word)
         }
