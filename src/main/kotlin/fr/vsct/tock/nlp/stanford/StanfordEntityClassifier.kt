@@ -21,6 +21,7 @@ package fr.vsct.tock.nlp.stanford
 import edu.stanford.nlp.ie.crf.CRFClassifier
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.ling.CoreLabel
+import fr.vsct.tock.nlp.core.Entity
 import fr.vsct.tock.nlp.core.EntityRecognition
 import fr.vsct.tock.nlp.core.EntityValue
 import fr.vsct.tock.nlp.core.IntOpenRange
@@ -53,11 +54,19 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
         return when (context) {
             is EntityCallContextForIntent -> classifyEntities(context, text, tokens)
             is EntityCallContextForEntity -> TODO()
-            is EntityCallContextForSubEntities -> TODO()
+            is EntityCallContextForSubEntities -> classifyEntities(context, text, tokens)
         }
     }
 
+    private fun classifyEntities(context: EntityCallContextForSubEntities, text: String, tokens: Array<String>): List<EntityRecognition> {
+        return classifyEntities(text, tokens) { context.entityType.findSubEntity(it) }
+    }
+
     private fun classifyEntities(context: EntityCallContextForIntent, text: String, tokens: Array<String>): List<EntityRecognition> {
+        return classifyEntities(text, tokens) { context.intent.getEntity(it) }
+    }
+
+    private fun classifyEntities(text: String, tokens: Array<String>, entityFinder: (String) -> Entity?): List<EntityRecognition> {
         return try {
             with(model) {
                 @Suppress("UNCHECKED_CAST")
@@ -73,8 +82,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
 
                 val coreTokens = mutableListOf<Token>()
                 var previousToken: Token? = null
-                document.forEachIndexed {
-                    index, word ->
+                document.forEachIndexed { index, word ->
                     var t = text
                     var start = 0
                     for (i in 0 until index) {
@@ -104,11 +112,17 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
                     }
                 }
 
-                coreTokens.map {
-                    EntityRecognition(EntityValue(it.start, it.end, context.intent.getEntity(it.type)), confidence)
+                coreTokens.mapNotNull {
+                    val entity = entityFinder.invoke(it.type)
+                    if (entity == null) {
+                        logger.warn { "unknown entity role ${it.type}" }
+                        null
+                    } else {
+                        EntityRecognition(EntityValue(it.start, it.end, entity), confidence)
+                    }
                 }
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             logger.error(e)
             emptyList()
         }
@@ -133,7 +147,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
             }
             val prob = 1 - (probSum / counter)
             return Math.round(prob * 1000) / 1000.0
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             logger.error(e) { "Exception during confidence calculation - skipped" }
             return 0.1
         }

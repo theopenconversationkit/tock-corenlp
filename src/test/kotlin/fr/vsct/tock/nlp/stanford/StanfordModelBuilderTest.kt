@@ -47,6 +47,7 @@ class StanfordModelBuilderTest {
                                 listOf(
                                         SampleEntity(
                                                 Entity(EntityType("test"), "test"),
+                                                emptyList(),
                                                 1,
                                                 5)
                                 ),
