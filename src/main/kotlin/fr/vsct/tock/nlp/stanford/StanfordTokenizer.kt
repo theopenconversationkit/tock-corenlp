@@ -38,16 +38,23 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
 
     companion object {
         private val logger = KotlinLogging.logger {}
-        private val separators: List<String> = listProperty("tock_stanford_tokens_separators", listOf("-", "'", "/", " ", "#"))
+        private val separators: List<String> =
+            listProperty("tock_stanford_tokens_separators", listOf("-", "'", "/", " ", "#"))
 
         private fun getTokenizerFactory(language: Locale): TokenizerFactory<CoreLabel> {
             logger.trace { "getting tokenizer for : $language" }
             return when (language.language) {
                 "fr" -> {
                     FrenchTokenizer.FrenchTokenizerFactory.newTokenizerFactory()
-                            .also {
-                                it.setOptions("untokenizable=noneDelete")
-                            }
+                        .also {
+                            it.setOptions("untokenizable=noneDelete")
+                            //workaround stanford incapacity to disable splitContractionOption
+                            FrenchTokenizer.FrenchTokenizerFactory::class.java.getDeclaredField("splitContractionOption")
+                                .apply {
+                                    isAccessible = true
+                                    set(it, false)
+                                }
+                        }
                 }
                 "en" -> {
                     PTBTokenizer.PTBTokenizerFactory.newCoreLabelTokenizerFactory("")
@@ -62,7 +69,7 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
         }
     }
 
-    val tokenizerFactory = getTokenizerFactory(model.language)
+    private val tokenizerFactory = getTokenizerFactory(model.language)
 
     override fun tokenize(context: TokenizerContext, text: String): Array<String> {
         var rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
@@ -81,7 +88,7 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
         return rawTokens.toTypedArray()
     }
 
-    fun splitSeparators(word: String): List<String> {
+    private fun splitSeparators(word: String): List<String> {
         fun splitSeparator(words: List<String>, separator: String): List<String> {
             return words.flatMap { w ->
                 if (w.length == 1) {
@@ -94,8 +101,9 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
                         val split = word.split(separator)
                         return split.mapIndexed { i, s ->
                             listOfNotNull(
-                                    if (i != 0) separator else null,
-                                    if (s.isNotEmpty()) s else null)
+                                if (i != 0) separator else null,
+                                if (s.isNotEmpty()) s else null
+                            )
                         }.flatMap { it }
                     }
                 }
