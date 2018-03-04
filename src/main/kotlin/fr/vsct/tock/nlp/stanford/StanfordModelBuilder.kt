@@ -31,6 +31,7 @@ import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelBuilder
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import fr.vsct.tock.shared.resourceAsStream
 import mu.KotlinLogging
 import java.io.BufferedReader
 import java.io.StringReader
@@ -48,16 +49,19 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
 
     const val TAB = "\t"
 
-    override fun buildTokenizerModel(context: TokenizerContext, expressions: List<SampleExpression>): TokenizerModelHolder {
+    override fun buildTokenizerModel(
+        context: TokenizerContext,
+        expressions: List<SampleExpression>
+    ): TokenizerModelHolder {
         return TokenizerModelHolder(context.language)
     }
 
     fun intentClassifierProperties(): Properties {
-        return Properties().apply { load(this::class.java.getResourceAsStream("/stanford/intentClassifier.prop")) }
+        return Properties().apply { load(resourceAsStream("/stanford/intentClassifier.prop")) }
     }
 
     fun entityClassifierProperties(): Properties {
-        return Properties().apply { load(this::class.java.getResourceAsStream("/stanford/crfclassifier.prop")) }
+        return Properties().apply { load(resourceAsStream("/stanford/crfclassifier.prop")) }
     }
 
 
@@ -77,17 +81,25 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         val trainingData = getEntityTrainData(context, expressions)
         try {
             val transformedData: ObjectBank<MutableList<CoreLabel>> = crfClassifier.makeObjectBankFromReader(
-                    trainingData.second,
-                    crfClassifier.defaultReaderAndWriter())
+                trainingData.second,
+                crfClassifier.defaultReaderAndWriter()
+            )
             crfClassifier.train(transformedData)
             return EntityModelHolder(crfClassifier, Instant.now())
         } catch (e: Exception) {
-            logger.error { "error with train data: \n ${getEntityTrainData(context, expressions).second.lines().collect(Collectors.joining("\n"))}" }
+            logger.error {
+                "error with train data: \n ${getEntityTrainData(context, expressions).second.lines().collect(
+                    Collectors.joining("\n")
+                )}"
+            }
             throw e
         }
     }
 
-    internal fun getEntityTrainData(context: EntityBuildContext, expressions: List<SampleExpression>): Pair<List<String>, BufferedReader> {
+    internal fun getEntityTrainData(
+        context: EntityBuildContext,
+        expressions: List<SampleExpression>
+    ): Pair<List<String>, BufferedReader> {
         val tokenizer = StanfordEngineProvider.getTokenizer(TokenizerModelHolder(context.language))
         val tokenizerContext = TokenizerContext(context)
         val list = mutableListOf<String>()
@@ -100,7 +112,8 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
             }
             val tokens = tokenizer.tokenize(tokenizerContext, text)
             val tokenMap = expression.entities.map { e ->
-                val start = if (e.start == 0) 0 else tokenizer.tokenize(tokenizerContext, text.substring(0, e.start)).size
+                val start =
+                    if (e.start == 0) 0 else tokenizer.tokenize(tokenizerContext, text.substring(0, e.start)).size
                 val end = start + tokenizer.tokenize(tokenizerContext, text.substring(e.start, e.end)).size
                 if (start >= tokens.size || end > tokens.size) {
                     emptyList()
