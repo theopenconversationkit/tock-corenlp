@@ -32,7 +32,6 @@ import fr.vsct.tock.nlp.model.EntityCallContextForSubEntities
 import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEntityClassifier
 import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.TAB
-import fr.vsct.tock.shared.error
 import mu.KotlinLogging
 import java.io.BufferedReader
 import java.io.StringReader
@@ -43,14 +42,20 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
 
     private val logger = KotlinLogging.logger {}
 
-    private data class Token(override val start: Int,
-                             override val end: Int,
-                             val text: String,
-                             val type: String) : IntOpenRange {
+    private data class Token(
+        override val start: Int,
+        override val end: Int,
+        val text: String,
+        val type: String
+    ) : IntOpenRange {
 
     }
 
-    override fun classifyEntities(context: EntityCallContext, text: String, tokens: Array<String>): List<EntityRecognition> {
+    override fun classifyEntities(
+        context: EntityCallContext,
+        text: String,
+        tokens: Array<String>
+    ): List<EntityRecognition> {
         return when (context) {
             is EntityCallContextForIntent -> classifyEntities(context, text, tokens)
             is EntityCallContextForEntity -> TODO()
@@ -58,15 +63,27 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
         }
     }
 
-    private fun classifyEntities(context: EntityCallContextForSubEntities, text: String, tokens: Array<String>): List<EntityRecognition> {
+    private fun classifyEntities(
+        context: EntityCallContextForSubEntities,
+        text: String,
+        tokens: Array<String>
+    ): List<EntityRecognition> {
         return classifyEntities(text, tokens) { context.entityType.findSubEntity(it) }
     }
 
-    private fun classifyEntities(context: EntityCallContextForIntent, text: String, tokens: Array<String>): List<EntityRecognition> {
+    private fun classifyEntities(
+        context: EntityCallContextForIntent,
+        text: String,
+        tokens: Array<String>
+    ): List<EntityRecognition> {
         return classifyEntities(text, tokens) { context.intent.getEntity(it) }
     }
 
-    private fun classifyEntities(text: String, tokens: Array<String>, entityFinder: (String) -> Entity?): List<EntityRecognition> {
+    private fun classifyEntities(
+        text: String,
+        tokens: Array<String>,
+        entityFinder: (String) -> Entity?
+    ): List<EntityRecognition> {
         return try {
             with(model) {
                 @Suppress("UNCHECKED_CAST")
@@ -123,7 +140,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
                 }
             }
         } catch (e: Exception) {
-            logger.error(e)
+            logger.error("error with $text and $tokens", e)
             emptyList()
         }
     }
