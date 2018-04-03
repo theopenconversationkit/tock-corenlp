@@ -21,7 +21,7 @@ package fr.vsct.tock.nlp.stanford
 import fr.vsct.tock.nlp.core.NlpEngineType
 import fr.vsct.tock.nlp.model.TokenizerContext
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.Locale
 import kotlin.test.assertEquals
 

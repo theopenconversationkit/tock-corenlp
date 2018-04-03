@@ -25,7 +25,7 @@ import fr.vsct.tock.nlp.core.NlpEngineType
 import fr.vsct.tock.nlp.model.EntityCallContextForIntent
 import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.shared.defaultLocale
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
 /**
@@ -35,13 +35,15 @@ class StanfordEntityClassifierTest {
 
     @Test
     fun classifyEntities_withEmptyEntityModel_shouldNotFail() {
-        val classifier = StanfordEntityClassifier(EntityModelHolder(CRFClassifier<CoreLabel>(StanfordModelBuilder.entityClassifierProperties())))
+        val classifier =
+            StanfordEntityClassifier(EntityModelHolder(CRFClassifier<CoreLabel>(StanfordModelBuilder.entityClassifierProperties())))
         val context = EntityCallContextForIntent(
-                "test",
-                Intent("test", emptyList()),
-                defaultLocale,
-                NlpEngineType.stanford,
-                ZonedDateTime.now())
+            "test",
+            Intent("test", emptyList()),
+            defaultLocale,
+            NlpEngineType.stanford,
+            ZonedDateTime.now()
+        )
 
         classifier.classifyEntities(context, "test", arrayOf("test"))
     }

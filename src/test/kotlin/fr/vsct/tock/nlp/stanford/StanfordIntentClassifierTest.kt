@@ -9,7 +9,7 @@ import fr.vsct.tock.nlp.integration.IntegrationConfiguration
 import fr.vsct.tock.nlp.model.IntentContext
 import fr.vsct.tock.nlp.model.TokenizerContext
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.Locale
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -28,22 +28,33 @@ class StanfordIntentClassifierTest {
         val dump = IntegrationConfiguration.loadDump(NlpEngineType.stanford)
         with(dump) {
             val sentence = "this is a hard day"
-            val application = Application(application.name, intents.map { Intent(it.qualifiedName, it.entities.map { Entity(EntityType(it.entityTypeName), it.role) }) }, setOf(language))
+            val application = Application(
+                application.name,
+                intents.map {
+                    Intent(
+                        it.qualifiedName,
+                        it.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
+                },
+                setOf(language)
+            )
             val context = IntentContext(application, language, NlpEngineType.stanford)
             val expressions = sentences.map { s ->
                 s.toSampleExpression(
-                        {
-                            intents.first { it._id == s.classification.intentId }
-                                    .let {
-                                        Intent(it.qualifiedName, it.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
-                                    }
-                        },
-                        { EntityType(it) }
+                    {
+                        intents.first { it._id == s.classification.intentId }
+                            .let {
+                                Intent(
+                                    it.qualifiedName,
+                                    it.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
+                            }
+                    },
+                    { EntityType(it) }
                 )
             }
             val modelHolder = StanfordModelBuilder.buildIntentModel(context, expressions)
             val classifier = StanfordIntentClassifier(modelHolder)
-            val classification = classifier.classifyIntent(context, sentence, tokenizer.tokenize(TokenizerContext(context), sentence))
+            val classification =
+                classifier.classifyIntent(context, sentence, tokenizer.tokenize(TokenizerContext(context), sentence))
 
             classification.next()
             val p1 = classification.probability()

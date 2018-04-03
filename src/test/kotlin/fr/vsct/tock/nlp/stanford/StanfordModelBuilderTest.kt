@@ -28,7 +28,7 @@ import fr.vsct.tock.nlp.core.sample.SampleExpression
 import fr.vsct.tock.nlp.model.EntityBuildContextForEntity
 import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.getEntityTrainData
 import fr.vsct.tock.shared.defaultLocale
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 /**
@@ -39,20 +39,22 @@ class StanfordModelBuilderTest {
     @Test
     fun getEntityTrainData_withNonTrimmedExpression_ShouldNotFail() {
         val data = getEntityTrainData(
-                EntityBuildContextForEntity(EntityType("test"), defaultLocale, NlpEngineType.stanford),
-                listOf(
-                        SampleExpression(
-                                " test",
-                                Intent("intent", emptyList()),
-                                listOf(
-                                        SampleEntity(
-                                                Entity(EntityType("test"), "test"),
-                                                emptyList(),
-                                                1,
-                                                5)
-                                ),
-                                SampleContext())
+            EntityBuildContextForEntity(EntityType("test"), defaultLocale, NlpEngineType.stanford),
+            listOf(
+                SampleExpression(
+                    " test",
+                    Intent("intent", emptyList()),
+                    listOf(
+                        SampleEntity(
+                            Entity(EntityType("test"), "test"),
+                            emptyList(),
+                            1,
+                            5
+                        )
+                    ),
+                    SampleContext()
                 )
+            )
         )
         assertEquals("test	test", data.second.readLine())
     }
