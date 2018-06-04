@@ -59,7 +59,7 @@ internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentCla
                         override fun next(): Intent {
                             return iterator.next().let { (key, proba) ->
                                 probability = Math.exp(proba - logSum)
-                                application.getIntent(key)
+                                application.getIntent(key) ?: Intent.UNKNOWN_INTENT
                             }
                         }
                     }
