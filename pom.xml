@@ -48,6 +48,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.litote.kmongo</groupId>
+            <artifactId>kmongo-jackson-modules-service-loader</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>fr.vsct.tock</groupId>
             <artifactId>tock-nlp-integration-tests</artifactId>
             <type>test-jar</type>
