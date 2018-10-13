@@ -30,22 +30,22 @@ class StanfordIntentClassifierTest {
             val sentence = "this is a hard day"
             val application = Application(
                 application.name,
-                intents.map {
+                intents.map { definition ->
                     Intent(
-                        it.qualifiedName,
-                        it.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
+                        definition.qualifiedName,
+                        definition.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
                 },
                 setOf(language)
             )
             val context = IntentContext(application, language, NlpEngineType.stanford)
             val expressions = sentences.map { s ->
                 s.toSampleExpression(
-                    {
+                    { id ->
                         intents.first { it._id == s.classification.intentId }
-                            .let {
+                            .let { definition ->
                                 Intent(
-                                    it.qualifiedName,
-                                    it.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
+                                    definition.qualifiedName,
+                                    definition.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
                             }
                     },
                     { EntityType(it) }

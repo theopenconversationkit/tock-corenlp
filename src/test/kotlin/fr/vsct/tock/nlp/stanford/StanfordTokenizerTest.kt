@@ -57,26 +57,23 @@ internal class StanfordTokenizerTest {
         assertEquals(0, tokens.size)
     }
 
-    //TODO improve this one
     @Test
     fun tokenize_specialChar_splitInOneToken() {
         val tokens = tokenizer.tokenize(context, "😀")
         assertEquals(1, tokens.size)
-        assertEquals("😀", tokens[0])
     }
 
     @Test
-    fun tokenize_twoSpecialChars_splitInOneToken() {
+    fun tokenize_twoSpecialChars_splitInTwoTokens() {
         val tokens = tokenizer.tokenize(context, "😀 😀")
-        assertEquals(1, tokens.size)
-        assertEquals("😀 😀", tokens[0])
+        assertEquals(2, tokens.size)
     }
 
     @Test
-    fun tokenize_twoSpecialCharsAndClassicWord_splitInOneToken() {
+    fun tokenize_twoSpecialCharsAndClassicWord_splitInThreeTokens() {
         val tokens = tokenizer.tokenize(context, "😀😀 Paris")
-        assertEquals(1, tokens.size)
-        assertEquals("Paris", tokens[0])
+        assertEquals(3, tokens.size)
+        assertEquals("Paris", tokens[2])
     }
 
     @Test

@@ -32,7 +32,7 @@
     <url>https://github.com/voyages-sncf-technologies/tock-corenlp</url>
 
     <properties>
-        <stanford>3.9.1</stanford>
+        <stanford>3.9.2</stanford>
     </properties>
 
     <dependencies>
