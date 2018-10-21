@@ -19,7 +19,7 @@ useTypeySequences=true
 useObservedSequencesOnly=true
 
 #same performance and same/worse results when true
-saveFeatureIndexToDisk=false
+saveFeatureIndexToDisk=true
 
 # almost same performance and better results when true
 lowercaseNGrams=true

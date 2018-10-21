@@ -26,9 +26,12 @@ import fr.vsct.tock.nlp.core.sample.SampleContext
 import fr.vsct.tock.nlp.core.sample.SampleEntity
 import fr.vsct.tock.nlp.core.sample.SampleExpression
 import fr.vsct.tock.nlp.model.EntityBuildContextForEntity
+import fr.vsct.tock.nlp.model.EntityBuildContextForIntent
 import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.getEntityTrainData
 import fr.vsct.tock.shared.defaultLocale
 import org.junit.jupiter.api.Test
+import java.util.Locale
+import kotlin.streams.toList
 import kotlin.test.assertEquals
 
 /**
@@ -57,5 +60,44 @@ class StanfordModelBuilderTest {
             )
         )
         assertEquals("test	test", data.second.readLine())
+    }
+
+    @Test
+    fun `getEntityTrainData with same tokens are ok`() {
+        val entityType = EntityType("type")
+        val data = getEntityTrainData(
+            EntityBuildContextForIntent(
+                "app",
+                Intent("test", listOf(Entity(entityType, "a"), Entity(entityType, "b"))),
+                Locale.FRENCH,
+                NlpEngineType.stanford
+            ),
+            listOf(
+                SampleExpression(
+                    "11/11 au 12/11",
+                    Intent("intent", emptyList()),
+                    listOf(
+                        SampleEntity(
+                            Entity(entityType, "a"),
+                            emptyList(),
+                            0,
+                            5
+                        ),
+                        SampleEntity(
+                            Entity(entityType, "b"),
+                            emptyList(),
+                            9,
+                            14
+                        )
+                    ),
+                    SampleContext()
+                )
+            )
+        )
+
+        assertEquals(
+            listOf("11\ta", "/\ta", "11\ta", "au\tO", "12\tb", "/\tb", "11\tb", ""),
+            data.second.lines().toList()
+        )
     }
 }

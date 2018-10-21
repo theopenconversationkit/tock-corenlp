@@ -35,7 +35,6 @@ import fr.vsct.tock.shared.resourceAsStream
 import mu.KotlinLogging
 import java.io.BufferedReader
 import java.io.StringReader
-import java.lang.StringBuilder
 import java.time.Instant
 import java.util.Properties
 import java.util.stream.Collectors
@@ -100,7 +99,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         context: EntityBuildContext,
         expressions: List<SampleExpression>
     ): Pair<List<String>, BufferedReader> {
-        val tokenizer = StanfordEngineProvider.getTokenizer(TokenizerModelHolder(context.language))
+        val tokenizer = StanfordEngineProvider.getStanfordTokenizer(TokenizerModelHolder(context.language))
         val tokenizerContext = TokenizerContext(context)
         val list = mutableListOf<String>()
         val sb = StringBuilder()
@@ -119,22 +118,23 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                     emptyList()
                 } else {
                     (start until end).map {
-                        tokens[it] to e.definition
+                        it to e.definition
                     }
                 }
             }.flatMap { it }.toMap()
 
-            tokens.forEach { token ->
-                val entity = tokenMap.get(token)
+            tokens.forEachIndexed { index, token ->
+                val entity = tokenMap[index]
                 if (entity != null) {
-                    sb.appendln("${token}${TAB}${entity.role}")
+                    sb.appendln("$token$TAB${entity.role}")
                 } else {
-                    sb.appendln("${token}${TAB}O")
+                    sb.appendln("$token${TAB}O")
                 }
             }
             list.add(text)
+            logger.trace { "$text ->\n$sb" }
             sb.appendln()
         }
-        return Pair(list, BufferedReader(StringReader(sb.toString())))
+        return list to BufferedReader(StringReader(sb.toString()))
     }
 }

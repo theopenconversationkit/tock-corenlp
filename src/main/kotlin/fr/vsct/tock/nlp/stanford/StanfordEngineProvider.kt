@@ -35,7 +35,7 @@ import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 class StanfordEngineProvider : NlpEngineProvider {
 
     companion object {
-        fun getTokenizer(model: TokenizerModelHolder): Tokenizer {
+        fun getStanfordTokenizer(model: TokenizerModelHolder): Tokenizer {
             return StanfordTokenizer(model)
         }
     }
@@ -53,7 +53,7 @@ class StanfordEngineProvider : NlpEngineProvider {
     }
 
     override fun getTokenizer(model: TokenizerModelHolder): Tokenizer {
-        return Companion.getTokenizer(model)
+        return getStanfordTokenizer(model)
     }
 
     override fun getModelBuilder(): NlpEngineModelBuilder {
