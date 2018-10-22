@@ -31,7 +31,7 @@ import kotlin.test.assertEquals
 internal class StanfordTokenizerTest {
 
     val tokenizer = StanfordTokenizer(TokenizerModelHolder(Locale.FRENCH))
-    val context = TokenizerContext(Locale.FRENCH, NlpEngineType.Companion.stanford)
+    val context = TokenizerContext(Locale.FRENCH, NlpEngineType.stanford)
 
     @Test
     fun tokenize_wordsWithDash_areSplitted() {
@@ -49,6 +49,41 @@ internal class StanfordTokenizerTest {
         assertEquals("'", tokens[2])
         assertEquals("Agde", tokens[3])
         assertEquals(4, tokens.size)
+    }
+
+    @Test
+    fun `tokenize is taken upper case into account`() {
+        val tokens = tokenizer.tokenize(context, "paris lyonle15 03")
+        assertEquals("Paris", tokens[0])
+        assertEquals("Nimes", tokens[1])
+    }
+
+    @Test
+    fun `tokenize handles special chars`() {
+        var tokens = tokenizer.tokenize(context, "s.25/3")
+        assertEquals("s", tokens[0])
+        assertEquals(".", tokens[1])
+        assertEquals("25", tokens[2])
+        assertEquals("/", tokens[3])
+        assertEquals("3", tokens[4])
+
+        tokens = tokenizer.tokenize(context, "Aller:15/02")
+        assertEquals("Aller", tokens[0])
+        assertEquals(":", tokens[1])
+        assertEquals("15", tokens[2])
+        assertEquals("/", tokens[3])
+        assertEquals("02", tokens[4])
+
+        tokens = tokenizer.tokenize(context, "A-l'l#e,f")
+        assertEquals("A", tokens[0])
+        assertEquals("-", tokens[1])
+        assertEquals("l", tokens[2])
+        assertEquals("'", tokens[3])
+        assertEquals("l", tokens[4])
+        assertEquals("#", tokens[5])
+        assertEquals("e", tokens[6])
+        assertEquals(",", tokens[7])
+        assertEquals("f", tokens[8])
     }
 
     @Test

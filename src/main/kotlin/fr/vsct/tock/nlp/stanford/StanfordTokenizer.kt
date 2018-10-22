@@ -26,6 +26,7 @@ import edu.stanford.nlp.process.TokenizerFactory
 import fr.vsct.tock.nlp.model.TokenizerContext
 import fr.vsct.tock.nlp.model.service.engine.NlpTokenizer
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import fr.vsct.tock.shared.error
 import fr.vsct.tock.shared.listProperty
 import mu.KotlinLogging
 import java.io.StringReader
@@ -39,7 +40,11 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
     companion object {
         private val logger = KotlinLogging.logger {}
         private val separators: List<String> =
-            listProperty("tock_stanford_tokens_separators", listOf("-", "'", "/", " ", "#"))
+            listProperty(
+                "tock_stanford_tokens_separators",
+                listOf("-", "'", "/", "\\s", "#", "\\:", "\\.", "\\,", "\\p{Lower}\\p{Upper}")
+            )
+        private val separatorRegexp = separators.joinToString("|").toRegex()
 
         private fun getTokenizerFactory(language: Locale): TokenizerFactory<CoreLabel> {
             logger.trace { "getting tokenizer for : $language" }
@@ -72,49 +77,39 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
     private val tokenizerFactory = getTokenizerFactory(model.language)
 
     override fun tokenize(context: TokenizerContext, text: String): Array<String> {
-        var rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
+        val rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
             val word = coreLabel.word()
             splitSeparators(word)
-        }
-        if (rawTokens.isEmpty()) {
-            rawTokens = if (text.trim().isEmpty()) {
-                emptyList()
+        }.let {
+            if (it.isEmpty()) {
+                if (text.trim().isEmpty()) {
+                    emptyList()
+                } else {
+                    logger.warn { "empty token list for $text, do not split" }
+                    listOf(text.trim())
+                }
             } else {
-                logger.warn { "empty token list for $text, do not split" }
-                listOf(text.trim())
+                it
             }
         }
+
 
         return rawTokens.toTypedArray()
     }
 
     private fun splitSeparators(word: String): List<String> {
-        fun splitSeparator(words: List<String>, separator: String): List<String> {
-            return words.flatMap { w ->
-                if (w.length == 1) {
-                    listOf(w)
-                } else {
-                    val index = w.indexOf(separator)
-                    if (index == -1) {
-                        listOf(w)
-                    } else {
-                        val split = word.split(separator)
-                        return split.mapIndexed { i, s ->
-                            listOfNotNull(
-                                if (i != 0) separator else null,
-                                if (s.isNotEmpty()) s else null
-                            )
-                        }.flatMap { it }
-                    }
-                }
+        return try {
+            separatorRegexp.replace(word) {
+                //if more than one char, than a space between chars to split the whole separator
+                it.value.run { if (length == 1) " $this " else toCharArray().joinToString(" ") }
             }
+                .trim()
+                .split(" ")
+                .toList()
+        } catch (e: Exception) {
+            logger.error(e)
+            listOf(word)
         }
-
-        var result = listOf(word)
-        separators.forEach {
-            result = splitSeparator(result, it)
-        }
-        return result
     }
 
 
