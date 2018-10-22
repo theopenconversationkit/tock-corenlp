@@ -103,12 +103,13 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         val sb = StringBuilder()
         val tokensIndexes: MutableMap<Int, Entity> = HashMap()
 
-        expressions.forEach { expression ->
+        expressions.forEach exp@{ expression ->
             val text = expression.text
             if (text.contains("\n") || text.contains("\t")) {
                 logger.warn { "expression $text contains \\n or \\t!!! - skipped" }
-                return@forEach
+                return@exp
             }
+            tokensIndexes.clear()
             val tokens = tokenizer.tokenize(tokenizerContext, text)
             expression.entities.forEach { e ->
                 val start =
@@ -120,6 +121,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                     }
                 } else {
                     logger.warn { "entity mismatch for $text" }
+                    return@exp
                 }
             }
 
@@ -130,7 +132,6 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                 sb.appendln(entity?.role ?: "O")
             }
             sb.appendln()
-            tokensIndexes.clear()
             logger.trace { "$text ->\n$sb" }
         }
         return BufferedReader(StringReader(sb.toString()))

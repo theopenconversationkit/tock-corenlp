@@ -100,4 +100,8 @@ class StanfordModelBuilderTest {
             data.lines().toList()
         )
     }
+
+    //Aller:15/02 - Retour:17/02
+    //22/3 /2018 retours.25/3 / 2018
+    //ParisNimes
 }
