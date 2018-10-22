@@ -59,11 +59,11 @@ class StanfordModelBuilderTest {
                 )
             )
         )
-        assertEquals("test	test", data.second.readLine())
+        assertEquals("test	test", data.readLine())
     }
 
     @Test
-    fun `getEntityTrainData with same tokens are ok`() {
+    fun `getEntityTrainData with same tokens is ok`() {
         val entityType = EntityType("type")
         val data = getEntityTrainData(
             EntityBuildContextForIntent(
@@ -97,7 +97,7 @@ class StanfordModelBuilderTest {
 
         assertEquals(
             listOf("11\ta", "/\ta", "11\ta", "au\tO", "12\tb", "/\tb", "11\tb", ""),
-            data.second.lines().toList()
+            data.lines().toList()
         )
     }
 }

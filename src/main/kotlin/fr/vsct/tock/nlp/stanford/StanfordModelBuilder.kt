@@ -23,6 +23,7 @@ import edu.stanford.nlp.classify.Dataset
 import edu.stanford.nlp.ie.crf.CRFClassifier
 import edu.stanford.nlp.ling.CoreLabel
 import edu.stanford.nlp.objectbank.ObjectBank
+import fr.vsct.tock.nlp.core.Entity
 import fr.vsct.tock.nlp.core.sample.SampleExpression
 import fr.vsct.tock.nlp.model.EntityBuildContext
 import fr.vsct.tock.nlp.model.IntentContext
@@ -37,7 +38,7 @@ import java.io.BufferedReader
 import java.io.StringReader
 import java.time.Instant
 import java.util.Properties
-import java.util.stream.Collectors
+import kotlin.streams.toList
 
 /**
  *
@@ -69,7 +70,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         val cdc = ColumnDataClassifier(properties)
         val dataset = Dataset<String, String>()
         expressions.map {
-            dataset.add(cdc.makeDatumFromLine("${it.intent.name}${TAB}$${it.text}"))
+            dataset.add(cdc.makeDatumFromLine("${it.intent.name}$TAB$${it.text}"))
         }
         val classifier = cdc.makeClassifier(dataset)
         return IntentModelHolder(context.application, StanfordIntentModel(cdc, classifier), Instant.now())
@@ -80,16 +81,14 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         val trainingData = getEntityTrainData(context, expressions)
         try {
             val transformedData: ObjectBank<MutableList<CoreLabel>> = crfClassifier.makeObjectBankFromReader(
-                trainingData.second,
+                trainingData,
                 crfClassifier.defaultReaderAndWriter()
             )
             crfClassifier.train(transformedData)
             return EntityModelHolder(crfClassifier, Instant.now())
         } catch (e: Exception) {
             logger.error {
-                "error with train data: \n ${getEntityTrainData(context, expressions).second.lines().collect(
-                    Collectors.joining("\n")
-                )}"
+                "error with train data: \n ${getEntityTrainData(context, expressions).lines().toList()}"
             }
             throw e
         }
@@ -98,11 +97,12 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
     internal fun getEntityTrainData(
         context: EntityBuildContext,
         expressions: List<SampleExpression>
-    ): Pair<List<String>, BufferedReader> {
+    ): BufferedReader {
         val tokenizer = StanfordEngineProvider.getStanfordTokenizer(TokenizerModelHolder(context.language))
         val tokenizerContext = TokenizerContext(context)
-        val list = mutableListOf<String>()
         val sb = StringBuilder()
+        val tokensIndexes: MutableMap<Int, Entity> = HashMap()
+
         expressions.forEach { expression ->
             val text = expression.text
             if (text.contains("\n") || text.contains("\t")) {
@@ -110,31 +110,29 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                 return@forEach
             }
             val tokens = tokenizer.tokenize(tokenizerContext, text)
-            val tokenMap = expression.entities.map { e ->
+            expression.entities.forEach { e ->
                 val start =
                     if (e.start == 0) 0 else tokenizer.tokenize(tokenizerContext, text.substring(0, e.start)).size
                 val end = start + tokenizer.tokenize(tokenizerContext, text.substring(e.start, e.end)).size
-                if (start >= tokens.size || end > tokens.size) {
-                    emptyList()
-                } else {
-                    (start until end).map {
-                        it to e.definition
+                if (start < tokens.size && end <= tokens.size) {
+                    for (i in start until end) {
+                        tokensIndexes[i] = e.definition
                     }
-                }
-            }.flatMap { it }.toMap()
-
-            tokens.forEachIndexed { index, token ->
-                val entity = tokenMap[index]
-                if (entity != null) {
-                    sb.appendln("$token$TAB${entity.role}")
                 } else {
-                    sb.appendln("$token${TAB}O")
+                    logger.warn { "entity mismatch for $text" }
                 }
             }
-            list.add(text)
-            logger.trace { "$text ->\n$sb" }
+
+            tokens.forEachIndexed { index, token ->
+                sb.append(token)
+                sb.append(TAB)
+                val entity = tokensIndexes[index]
+                sb.appendln(entity?.role ?: "O")
+            }
             sb.appendln()
+            tokensIndexes.clear()
+            logger.trace { "$text ->\n$sb" }
         }
-        return list to BufferedReader(StringReader(sb.toString()))
+        return BufferedReader(StringReader(sb.toString()))
     }
 }
