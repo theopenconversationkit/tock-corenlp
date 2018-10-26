@@ -53,7 +53,7 @@ internal class StanfordTokenizerTest {
 
     @Test
     fun `tokenize is taken upper case into account`() {
-        val tokens = tokenizer.tokenize(context, "paris lyonle15 03")
+        val tokens = tokenizer.tokenize(context, "ParisNimes")
         assertEquals("Paris", tokens[0])
         assertEquals("Nimes", tokens[1])
     }
