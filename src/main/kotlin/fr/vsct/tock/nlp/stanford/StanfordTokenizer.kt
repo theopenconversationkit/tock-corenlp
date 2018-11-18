@@ -27,10 +27,10 @@ import fr.vsct.tock.nlp.model.TokenizerContext
 import fr.vsct.tock.nlp.model.service.engine.NlpTokenizer
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 import fr.vsct.tock.shared.error
-import fr.vsct.tock.shared.listProperty
 import mu.KotlinLogging
 import java.io.StringReader
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  *
@@ -39,13 +39,7 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
 
     companion object {
         private val logger = KotlinLogging.logger {}
-        private val separators: List<String> =
-            listProperty(
-                "tock_stanford_tokens_separators",
-                listOf("-", "'", "/", "\\s", "#", "\\:", "\\.", "\\,", "\\p{Lower}\\p{Upper}")
-            )
-        private val separatorRegexp = separators.joinToString("|").toRegex()
-
+        private val separatorRegexpMap = ConcurrentHashMap<String, Regex>()
         private fun getTokenizerFactory(language: Locale): TokenizerFactory<CoreLabel> {
             logger.trace { "getting tokenizer for : $language" }
             return when (language.language) {
@@ -79,7 +73,10 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
     override fun tokenize(context: TokenizerContext, text: String): Array<String> {
         val rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
             val word = coreLabel.word()
-            splitSeparators(word)
+            splitSeparators(
+                word,
+                model.configuration.tokenizerConfiguration.properties.getProperty("tock_stanford_tokens_separators")
+            )
         }.let {
             if (it.isEmpty()) {
                 if (text.trim().isEmpty()) {
@@ -97,9 +94,16 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
         return rawTokens.toTypedArray()
     }
 
-    private fun splitSeparators(word: String): List<String> {
+    private fun separatorRegex(separators: String): Regex =
+        separatorRegexpMap.getOrPut(separators) {
+            logger.info { "using token separators: $separators" }
+            val s: List<String> = separators.split(",")
+            s.joinToString("|").toRegex()
+        }
+
+    private fun splitSeparators(word: String, separators: String): List<String> {
         return try {
-            separatorRegexp.replace(word) {
+            separatorRegex(separators).replace(word) {
                 //if more than one char, than a space between chars to split the whole separator
                 it.value.run { if (length == 1) " $this " else toCharArray().joinToString(" ") }
             }

@@ -27,7 +27,6 @@ import fr.vsct.tock.nlp.model.service.storage.NlpModelStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.OutputStream
-import java.util.Properties
 
 /**
  *
@@ -38,19 +37,27 @@ internal object StanfordModelIo : NlpEngineModelIo {
         TODO()
     }
 
-    override fun loadIntentModel(input: NlpModelStream): Any {
-        val objectStream = ObjectInputStream(input.inputStream)
-        @Suppress("UNCHECKED_CAST")
-        val classifier = objectStream.readObject() as Classifier<String, String>
-        val properties = objectStream.readObject() as Properties
-        return StanfordIntentModel(ColumnDataClassifier(properties), classifier)
-    }
+    override fun loadIntentModel(input: NlpModelStream): Any =
+        ObjectInputStream(input.inputStream).use {
+            @Suppress("UNCHECKED_CAST")
+            val classifier = it.readObject() as Classifier<String, String>
+            StanfordIntentModel(
+                ColumnDataClassifier(
+                    input.configuration?.intentConfiguration?.properties
+                            ?: StanfordModelBuilder.defaultIntentClassifierConfiguration.properties
+                )
+                , classifier
+            )
+        }
 
-    override fun loadEntityModel(input: NlpModelStream): Any {
-        val crfClassifier = CRFClassifier<CoreLabel>(StanfordModelBuilder.entityClassifierProperties())
-        crfClassifier.loadClassifier(input.inputStream)
-        return crfClassifier
-    }
+    override fun loadEntityModel(input: NlpModelStream): Any =
+        input.inputStream.use { stream ->
+            CRFClassifier<CoreLabel>(
+                input.configuration?.entityConfiguration?.properties
+                        ?: StanfordModelBuilder.defaultEntityClassifierConfiguration.properties
+            )
+                .apply { loadClassifier(stream) }
+        }
 
     override fun copyTokenizerModel(model: Any, output: OutputStream) {
         TODO()
@@ -61,7 +68,6 @@ internal object StanfordModelIo : NlpEngineModelIo {
         val objectOutputStream = ObjectOutputStream(output)
         objectOutputStream.use {
             objectOutputStream.writeObject(stanfordModel.classifier)
-            objectOutputStream.writeObject(StanfordModelBuilder.intentClassifierProperties())
         }
     }
 

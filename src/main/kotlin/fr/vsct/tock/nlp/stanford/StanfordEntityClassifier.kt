@@ -47,9 +47,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
         override val end: Int,
         val text: String,
         val type: String
-    ) : IntOpenRange {
-
-    }
+    ) : IntOpenRange
 
     override fun classifyEntities(
         context: EntityCallContext,
@@ -91,7 +89,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
 
                 val evaluationData = getEvaluationData(tokens)
                 val documents = classifier.makeObjectBankFromReader(evaluationData, classifier.defaultReaderAndWriter())
-                val document = documents.flatMap { it }
+                val document = documents.flatten()
 
                 val classifiedLabels = classifier.classify(document)
 

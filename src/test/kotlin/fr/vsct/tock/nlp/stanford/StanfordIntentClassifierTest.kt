@@ -21,7 +21,12 @@ import kotlin.test.assertTrue
 class StanfordIntentClassifierTest {
 
     private val language = Locale.ENGLISH
-    private val tokenizer = StanfordTokenizer(TokenizerModelHolder(language))
+    private val tokenizer = StanfordTokenizer(
+        TokenizerModelHolder(
+            language,
+            StanfordModelBuilder.defaultNlpApplicationConfiguration()
+        )
+    )
 
     @Test
     fun classifyIntent_shouldReturnsAllIntentsAvailable() {
@@ -40,8 +45,8 @@ class StanfordIntentClassifierTest {
             val context = IntentContext(application, language, NlpEngineType.stanford)
             val expressions = sentences.map { s ->
                 s.toSampleExpression(
-                    { id ->
-                        intents.first { it._id == s.classification.intentId }
+                    {
+                        intents.first { intent -> intent._id == s.classification.intentId }
                             .let { definition ->
                                 Intent(
                                     definition.qualifiedName,
@@ -51,7 +56,10 @@ class StanfordIntentClassifierTest {
                     { EntityType(it) }
                 )
             }
-            val modelHolder = StanfordModelBuilder.buildIntentModel(context, expressions)
+            val modelHolder = StanfordModelBuilder.buildIntentModel(
+                context,
+                StanfordModelBuilder.defaultNlpApplicationConfiguration(), expressions
+            )
             val classifier = StanfordIntentClassifier(modelHolder)
             val classification =
                 classifier.classifyIntent(context, sentence, tokenizer.tokenize(TokenizerContext(context), sentence))

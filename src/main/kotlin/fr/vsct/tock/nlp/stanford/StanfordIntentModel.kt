@@ -24,6 +24,7 @@ import edu.stanford.nlp.classify.ColumnDataClassifier
 /**
  *
  */
-internal data class StanfordIntentModel(val cdc: ColumnDataClassifier,
-                                        val classifier: Classifier<String, String>) {
-}
+internal data class StanfordIntentModel(
+    val cdc: ColumnDataClassifier,
+    val classifier: Classifier<String, String>
+)

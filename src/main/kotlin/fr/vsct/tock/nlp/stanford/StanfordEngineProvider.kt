@@ -19,14 +19,14 @@
 package fr.vsct.tock.nlp.stanford
 
 import fr.vsct.tock.nlp.core.NlpEngineType
-import fr.vsct.tock.nlp.model.EntityClassifier
-import fr.vsct.tock.nlp.model.IntentClassifier
-import fr.vsct.tock.nlp.model.Tokenizer
+import fr.vsct.tock.nlp.model.service.engine.EntityClassifier
 import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
+import fr.vsct.tock.nlp.model.service.engine.IntentClassifier
 import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelBuilder
 import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelIo
 import fr.vsct.tock.nlp.model.service.engine.NlpEngineProvider
+import fr.vsct.tock.nlp.model.service.engine.Tokenizer
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 
 /**
@@ -40,9 +40,7 @@ class StanfordEngineProvider : NlpEngineProvider {
         }
     }
 
-    override fun type(): NlpEngineType {
-        return NlpEngineType.stanford
-    }
+    override val type: NlpEngineType = NlpEngineType.stanford
 
     override fun getIntentClassifier(model: IntentModelHolder): IntentClassifier {
         return StanfordIntentClassifier(model)
@@ -56,11 +54,7 @@ class StanfordEngineProvider : NlpEngineProvider {
         return getStanfordTokenizer(model)
     }
 
-    override fun getModelBuilder(): NlpEngineModelBuilder {
-        return StanfordModelBuilder
-    }
+    override val modelBuilder: NlpEngineModelBuilder = StanfordModelBuilder
 
-    override fun getModelIo(): NlpEngineModelIo {
-        return StanfordModelIo
-    }
+    override val modelIo: NlpEngineModelIo = StanfordModelIo
 }

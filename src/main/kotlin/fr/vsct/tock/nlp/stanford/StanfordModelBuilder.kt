@@ -24,6 +24,8 @@ import edu.stanford.nlp.ie.crf.CRFClassifier
 import edu.stanford.nlp.ling.CoreLabel
 import edu.stanford.nlp.objectbank.ObjectBank
 import fr.vsct.tock.nlp.core.Entity
+import fr.vsct.tock.nlp.core.configuration.NlpApplicationConfiguration
+import fr.vsct.tock.nlp.core.configuration.NlpModelConfiguration
 import fr.vsct.tock.nlp.core.sample.SampleExpression
 import fr.vsct.tock.nlp.model.EntityBuildContext
 import fr.vsct.tock.nlp.model.IntentContext
@@ -32,12 +34,10 @@ import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelBuilder
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
-import fr.vsct.tock.shared.resourceAsStream
+import fr.vsct.tock.shared.loadProperties
 import mu.KotlinLogging
 import java.io.BufferedReader
 import java.io.StringReader
-import java.time.Instant
-import java.util.Properties
 import kotlin.streams.toList
 
 /**
@@ -51,44 +51,52 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
 
     override fun buildTokenizerModel(
         context: TokenizerContext,
+        configuration: NlpApplicationConfiguration,
         expressions: List<SampleExpression>
     ): TokenizerModelHolder {
-        return TokenizerModelHolder(context.language)
+        return TokenizerModelHolder(context.language, configuration)
     }
 
-    fun intentClassifierProperties(): Properties {
-        return Properties().apply { load(resourceAsStream("/stanford/intentClassifier.prop")) }
-    }
+    override val defaultEntityClassifierConfiguration: NlpModelConfiguration =
+        NlpModelConfiguration(loadProperties("/stanford/crfclassifier.properties"))
 
-    fun entityClassifierProperties(): Properties {
-        return Properties().apply { load(resourceAsStream("/stanford/crfclassifier.prop")) }
-    }
+    override val defaultIntentClassifierConfiguration: NlpModelConfiguration =
+        NlpModelConfiguration(loadProperties("/stanford/intentClassifier.properties"))
 
+    override val defaultTokenizerConfiguration: NlpModelConfiguration =
+        NlpModelConfiguration(loadProperties("/stanford/tokenizer.properties"))
 
-    override fun buildIntentModel(context: IntentContext, expressions: List<SampleExpression>): IntentModelHolder {
-        val properties = intentClassifierProperties()
-        val cdc = ColumnDataClassifier(properties)
+    override fun buildIntentModel(
+        context: IntentContext,
+        configuration: NlpApplicationConfiguration,
+        expressions: List<SampleExpression>
+    ): IntentModelHolder {
+        val cdc = ColumnDataClassifier(configuration.intentConfiguration.properties)
         val dataset = Dataset<String, String>()
         expressions.map {
             dataset.add(cdc.makeDatumFromLine("${it.intent.name}$TAB$${it.text}"))
         }
         val classifier = cdc.makeClassifier(dataset)
-        return IntentModelHolder(context.application, StanfordIntentModel(cdc, classifier), Instant.now())
+        return IntentModelHolder(context.application, StanfordIntentModel(cdc, classifier), configuration)
     }
 
-    override fun buildEntityModel(context: EntityBuildContext, expressions: List<SampleExpression>): EntityModelHolder {
-        val crfClassifier = CRFClassifier<CoreLabel>(entityClassifierProperties())
-        val trainingData = getEntityTrainData(context, expressions)
+    override fun buildEntityModel(
+        context: EntityBuildContext,
+        configuration: NlpApplicationConfiguration,
+        expressions: List<SampleExpression>
+    ): EntityModelHolder {
+        val crfClassifier = CRFClassifier<CoreLabel>(configuration.entityConfiguration.properties)
+        val trainingData = getEntityTrainData(context, configuration, expressions)
         try {
             val transformedData: ObjectBank<MutableList<CoreLabel>> = crfClassifier.makeObjectBankFromReader(
                 trainingData,
                 crfClassifier.defaultReaderAndWriter()
             )
             crfClassifier.train(transformedData)
-            return EntityModelHolder(crfClassifier, Instant.now())
+            return EntityModelHolder(crfClassifier, configuration)
         } catch (e: Exception) {
             logger.error {
-                "error with train data: \n ${getEntityTrainData(context, expressions).lines().toList()}"
+                "error with train data: \n ${getEntityTrainData(context, configuration, expressions).lines().toList()}"
             }
             throw e
         }
@@ -96,9 +104,11 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
 
     internal fun getEntityTrainData(
         context: EntityBuildContext,
+        configuration: NlpApplicationConfiguration,
         expressions: List<SampleExpression>
     ): BufferedReader {
-        val tokenizer = StanfordEngineProvider.getStanfordTokenizer(TokenizerModelHolder(context.language))
+        val tokenizer =
+            StanfordEngineProvider.getStanfordTokenizer(TokenizerModelHolder(context.language, configuration))
         val tokenizerContext = TokenizerContext(context)
         val sb = StringBuilder()
         val tokensIndexes: MutableMap<Int, Entity> = HashMap()

@@ -21,6 +21,7 @@ package fr.vsct.tock.nlp.stanford
 import fr.vsct.tock.nlp.core.NlpEngineType
 import fr.vsct.tock.nlp.model.TokenizerContext
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.defaultNlpApplicationConfiguration
 import org.junit.jupiter.api.Test
 import java.util.Locale
 import kotlin.test.assertEquals
@@ -30,8 +31,8 @@ import kotlin.test.assertEquals
  */
 internal class StanfordTokenizerTest {
 
-    val tokenizer = StanfordTokenizer(TokenizerModelHolder(Locale.FRENCH))
-    val context = TokenizerContext(Locale.FRENCH, NlpEngineType.stanford)
+    val tokenizer = StanfordTokenizer(TokenizerModelHolder(Locale.FRENCH, defaultNlpApplicationConfiguration()))
+    val context = TokenizerContext(Locale.FRENCH, NlpEngineType.stanford, "app")
 
     @Test
     fun tokenize_wordsWithDash_areSplitted() {

@@ -27,6 +27,7 @@ import fr.vsct.tock.nlp.core.sample.SampleEntity
 import fr.vsct.tock.nlp.core.sample.SampleExpression
 import fr.vsct.tock.nlp.model.EntityBuildContextForEntity
 import fr.vsct.tock.nlp.model.EntityBuildContextForIntent
+import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.defaultNlpApplicationConfiguration
 import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.getEntityTrainData
 import fr.vsct.tock.shared.defaultLocale
 import org.junit.jupiter.api.Test
@@ -42,7 +43,8 @@ class StanfordModelBuilderTest {
     @Test
     fun getEntityTrainData_withNonTrimmedExpression_ShouldNotFail() {
         val data = getEntityTrainData(
-            EntityBuildContextForEntity(EntityType("test"), defaultLocale, NlpEngineType.stanford),
+            EntityBuildContextForEntity(EntityType("test"), defaultLocale, NlpEngineType.stanford, "app"),
+            defaultNlpApplicationConfiguration(),
             listOf(
                 SampleExpression(
                     " test",
@@ -67,11 +69,12 @@ class StanfordModelBuilderTest {
         val entityType = EntityType("type")
         val data = getEntityTrainData(
             EntityBuildContextForIntent(
-                "app",
                 Intent("test", listOf(Entity(entityType, "a"), Entity(entityType, "b"))),
                 Locale.FRENCH,
-                NlpEngineType.stanford
+                NlpEngineType.stanford,
+                "app"
             ),
+            defaultNlpApplicationConfiguration(),
             listOf(
                 SampleExpression(
                     "11/11 au 12/11",
