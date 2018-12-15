@@ -33,9 +33,6 @@ import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEntityClassifier
 import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.TAB
 import mu.KotlinLogging
-import java.io.BufferedReader
-import java.io.StringReader
-import java.lang.Exception
 
 
 internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityClassifier(model) {
@@ -88,7 +85,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
                 val classifier = nativeModel as CRFClassifier<CoreLabel>
 
                 val evaluationData = getEvaluationData(tokens)
-                val documents = classifier.makeObjectBankFromReader(evaluationData, classifier.defaultReaderAndWriter())
+                val documents = classifier.makeObjectBankFromString(evaluationData, classifier.defaultReaderAndWriter())
                 val document = documents.flatten()
 
                 val classifiedLabels = classifier.classify(document)
@@ -143,10 +140,8 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
         }
     }
 
-    private fun getEvaluationData(tokens: Array<String>): BufferedReader {
-        val line = tokens.joinToString(separator = "") { "$it${TAB}O\n" }
-        return BufferedReader(StringReader(line))
-    }
+    private fun getEvaluationData(tokens: Array<String>): String =
+        tokens.joinToString(separator = "") { "$it${TAB}O\n" }
 
     private fun getConfidence(classifier: CRFClassifier<CoreLabel>, classifiedLabels: List<CoreLabel>): Double {
         try {

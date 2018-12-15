@@ -36,9 +36,7 @@ import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelBuilder
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
 import fr.vsct.tock.shared.loadProperties
 import mu.KotlinLogging
-import java.io.BufferedReader
-import java.io.StringReader
-import kotlin.streams.toList
+
 
 /**
  *
@@ -88,7 +86,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         val crfClassifier = CRFClassifier<CoreLabel>(configuration.entityConfiguration.properties)
         val trainingData = getEntityTrainData(context, configuration, expressions)
         try {
-            val transformedData: ObjectBank<MutableList<CoreLabel>> = crfClassifier.makeObjectBankFromReader(
+            val transformedData: ObjectBank<MutableList<CoreLabel>> = crfClassifier.makeObjectBankFromString(
                 trainingData,
                 crfClassifier.defaultReaderAndWriter()
             )
@@ -96,7 +94,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
             return EntityModelHolder(crfClassifier, configuration)
         } catch (e: Exception) {
             logger.error {
-                "error with train data: \n ${getEntityTrainData(context, configuration, expressions).lines().toList()}"
+                "error with train data: \n $trainingData"
             }
             throw e
         }
@@ -106,7 +104,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         context: EntityBuildContext,
         configuration: NlpApplicationConfiguration,
         expressions: List<SampleExpression>
-    ): BufferedReader {
+    ): String {
         val tokenizer =
             StanfordEngineProvider.getStanfordTokenizer(TokenizerModelHolder(context.language, configuration))
         val tokenizerContext = TokenizerContext(context)
@@ -141,9 +139,9 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                 val entity = tokensIndexes[index]
                 sb.appendln(entity?.role ?: "O")
             }
-            sb.appendln()
             logger.trace { "$text ->\n$sb" }
         }
-        return BufferedReader(StringReader(sb.toString()))
+
+        return sb.toString()
     }
 }

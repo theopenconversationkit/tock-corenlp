@@ -32,7 +32,6 @@ import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.getEntityTrainData
 import fr.vsct.tock.shared.defaultLocale
 import org.junit.jupiter.api.Test
 import java.util.Locale
-import kotlin.streams.toList
 import kotlin.test.assertEquals
 
 /**
@@ -61,7 +60,7 @@ class StanfordModelBuilderTest {
                 )
             )
         )
-        assertEquals("test	test", data.readLine())
+        assertEquals("test	test", data.split("\n").first())
     }
 
     @Test
@@ -100,7 +99,7 @@ class StanfordModelBuilderTest {
 
         assertEquals(
             listOf("11\ta", "/\ta", "11\ta", "au\tO", "12\tb", "/\tb", "11\tb", ""),
-            data.lines().toList()
+            data.split("\n").toList()
         )
     }
 }
