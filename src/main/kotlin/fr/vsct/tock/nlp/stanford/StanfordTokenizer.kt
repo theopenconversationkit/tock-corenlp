@@ -90,6 +90,7 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
             }
         }
 
+        logger.debug { rawTokens }
 
         return rawTokens.toTypedArray()
     }

@@ -139,6 +139,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                 val entity = tokensIndexes[index]
                 sb.appendln(entity?.role ?: "O")
             }
+            sb.appendln()
             logger.trace { "$text ->\n$sb" }
         }
 

@@ -98,7 +98,53 @@ class StanfordModelBuilderTest {
         )
 
         assertEquals(
-            listOf("11\ta", "/\ta", "11\ta", "au\tO", "12\tb", "/\tb", "11\tb", ""),
+            listOf("11\ta", "/\ta", "11\ta", "au\tO", "12\tb", "/\tb", "11\tb", "", ""),
+            data.split("\n").toList()
+        )
+    }
+
+    @Test
+    fun `separator of two train data is one line separator`() {
+        val entityType = EntityType("type")
+        val data = getEntityTrainData(
+            EntityBuildContextForIntent(
+                Intent("test", listOf(Entity(entityType, "a"), Entity(entityType, "b"))),
+                Locale.FRENCH,
+                NlpEngineType.stanford,
+                "app"
+            ),
+            defaultNlpApplicationConfiguration(),
+            listOf(
+                SampleExpression(
+                    "11/11 au 12/11",
+                    Intent("intent", emptyList()),
+                    listOf(
+                        SampleEntity(
+                            Entity(entityType, "a"),
+                            emptyList(),
+                            0,
+                            5
+                        ),
+                        SampleEntity(
+                            Entity(entityType, "b"),
+                            emptyList(),
+                            9,
+                            14
+                        )
+                    ),
+                    SampleContext()
+                ),
+                SampleExpression(
+                    "ok",
+                    Intent("intent", emptyList()),
+                    listOf(),
+                    SampleContext()
+                )
+            )
+        )
+
+        assertEquals(
+            listOf("11\ta", "/\ta", "11\ta", "au\tO", "12\tb", "/\tb", "11\tb", "", "ok\tO", "", ""),
             data.split("\n").toList()
         )
     }
