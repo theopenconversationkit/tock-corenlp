@@ -120,4 +120,17 @@ internal class StanfordTokenizerTest {
         assertEquals("zea", tokens[1])
         assertEquals("1", tokens[2])
     }
+
+    @Test
+    fun tokenize_StringWithComma_shouldSplitTokens() {
+        val tokens = tokenizer.tokenize(context, "Paris aix ,12 mars")
+        assertEquals(5, tokens.size)
+        assertEquals("Paris", tokens[0])
+        assertEquals("aix", tokens[1])
+        assertEquals(",", tokens[2])
+        assertEquals("12", tokens[3])
+        assertEquals("mars", tokens[4])
+    }
+
+
 }

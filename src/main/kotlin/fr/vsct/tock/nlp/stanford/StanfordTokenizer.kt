@@ -98,7 +98,10 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
     private fun separatorRegex(separators: String): Regex =
         separatorRegexpMap.getOrPut(separators) {
             logger.info { "using token separators: $separators" }
-            val s: List<String> = separators.split(",")
+            val s: List<String> = separators
+                .replace("\\,", "_comma_")
+                .split(",")
+                .map { it.replace("_comma_", ",") }
             s.joinToString("|").toRegex()
         }
 
