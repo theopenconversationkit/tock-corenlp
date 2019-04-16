@@ -33,6 +33,7 @@ import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEntityClassifier
 import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.TAB
 import mu.KotlinLogging
+import java.util.Arrays
 
 
 internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityClassifier(model) {
@@ -135,7 +136,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
                 }
             }
         } catch (e: Exception) {
-            logger.error("error with $text and $tokens", e)
+            logger.error("error with $text and ${Arrays.toString(tokens)}", e)
             emptyList()
         }
     }
