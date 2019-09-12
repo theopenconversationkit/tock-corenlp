@@ -17,7 +17,8 @@
   ~  along with this program. If not, see <http://www.gnu.org/licenses />.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -116,6 +117,14 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-tock</id>
+            <name>bintray</name>
+            <url>https://dl.bintray.com/tock/tock</url>
+        </repository>
     </repositories>
 
     <licenses>
@@ -123,7 +132,7 @@
             <name>GNU General Public License (GPL) version 3.0</name>
             <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
             <distribution>repo</distribution>
-            <comments />
+            <comments/>
         </license>
     </licenses>
 
@@ -133,5 +142,26 @@
         <url>git@github.com:voyages-sncf-technologies/tock-corenlp.git</url>
         <tag>HEAD</tag>
     </scm>
+
+    <profiles>
+        <profile>
+            <id>milestone</id>
+            <activation>
+                <property>
+                    <name>milestone</name>
+                </property>
+            </activation>
+            <properties>
+                <gpg.skip>false</gpg.skip>
+            </properties>
+            <distributionManagement>
+                <repository>
+                    <id>bintray-tock</id>
+                    <name>tock-build</name>
+                    <url>https://api.bintray.com/maven/tock/tock/tock-stanford/;publish=1;override=1</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
 </project>
