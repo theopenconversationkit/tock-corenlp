@@ -31,6 +31,7 @@ import fr.vsct.tock.nlp.model.EntityCallContextForIntent
 import fr.vsct.tock.nlp.model.EntityCallContextForSubEntities
 import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEntityClassifier
+import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.ADJACENT_ENTITY_MARKER
 import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.TAB
 import mu.KotlinLogging
 import java.util.Arrays
@@ -38,7 +39,10 @@ import java.util.Arrays
 
 internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityClassifier(model) {
 
-    private val logger = KotlinLogging.logger {}
+    companion object {
+        private val logger = KotlinLogging.logger {}
+        private val adjacentMarkerRegep = ADJACENT_ENTITY_MARKER.toRegex()
+    }
 
     private data class Token(
         override val start: Int,
@@ -126,7 +130,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
                 }
 
                 coreTokens.mapNotNull {
-                    val entity = entityFinder.invoke(it.type)
+                    val entity = entityFinder.invoke(it.type.replaceFirst(adjacentMarkerRegep, ""))
                     if (entity == null) {
                         logger.warn { "unknown entity role ${it.type}" }
                         null

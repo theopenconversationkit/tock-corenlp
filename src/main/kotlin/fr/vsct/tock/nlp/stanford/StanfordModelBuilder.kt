@@ -23,9 +23,9 @@ import edu.stanford.nlp.classify.Dataset
 import edu.stanford.nlp.ie.crf.CRFClassifier
 import edu.stanford.nlp.ling.CoreLabel
 import edu.stanford.nlp.objectbank.ObjectBank
-import fr.vsct.tock.nlp.core.Entity
 import fr.vsct.tock.nlp.core.configuration.NlpApplicationConfiguration
 import fr.vsct.tock.nlp.core.configuration.NlpModelConfiguration
+import fr.vsct.tock.nlp.core.sample.SampleEntity
 import fr.vsct.tock.nlp.core.sample.SampleExpression
 import fr.vsct.tock.nlp.model.EntityBuildContext
 import fr.vsct.tock.nlp.model.IntentContext
@@ -46,6 +46,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
     private val logger = KotlinLogging.logger {}
 
     const val TAB = "\t"
+    const val ADJACENT_ENTITY_MARKER = "__near__"
 
     override fun buildTokenizerModel(
         context: TokenizerContext,
@@ -109,8 +110,8 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
             StanfordEngineProvider.getStanfordTokenizer(TokenizerModelHolder(context.language, configuration))
         val tokenizerContext = TokenizerContext(context)
         val sb = StringBuilder()
-        val tokensIndexes: MutableMap<Int, Entity> = HashMap()
-
+        val tokensIndexes: MutableMap<Int, SampleEntity> = HashMap()
+        val entityRoleMap: MutableMap<SampleEntity, String> = HashMap()
         expressions.forEach exp@{ expression ->
             val text = expression.text
             if (text.contains("\n") || text.contains("\t")) {
@@ -118,6 +119,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                 return@exp
             }
             tokensIndexes.clear()
+            entityRoleMap.clear()
             val tokens = tokenizer.tokenize(tokenizerContext, text)
             expression.entities.forEach { e ->
                 val start =
@@ -125,7 +127,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                 val end = start + tokenizer.tokenize(tokenizerContext, text.substring(e.start, e.end)).size
                 if (start < tokens.size && end <= tokens.size) {
                     for (i in start until end) {
-                        tokensIndexes[i] = e.definition
+                        tokensIndexes[i] = e
                     }
                 } else {
                     logger.warn { "entity mismatch for $text" }
@@ -134,10 +136,29 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
             }
 
             tokens.forEachIndexed { index, token ->
+                val entity = tokensIndexes[index]
+
+                val role = when {
+                    entity == null -> "O"
+                    index == 0 -> entity.definition.role
+                    else -> {
+                        //deal with adjacent entities
+                        val alreadyKnown = entityRoleMap[entity]
+                        if (alreadyKnown != null) {
+                            alreadyKnown
+                        } else {
+                            val r = tokensIndexes[index - 1]
+                                ?.takeIf { entityRoleMap[it] == entity.definition.role }
+                                ?.let { "$ADJACENT_ENTITY_MARKER${it.definition.role}" }
+                                ?: entity.definition.role
+                            entityRoleMap[entity] = r
+                            r
+                        }
+                    }
+                }
                 sb.append(token)
                 sb.append(TAB)
-                val entity = tokensIndexes[index]
-                sb.appendln(entity?.role ?: "O")
+                sb.appendln(role)
             }
             sb.appendln()
             logger.trace { "$text ->\n$sb" }
