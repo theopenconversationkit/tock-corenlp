@@ -34,6 +34,7 @@ import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
 import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
 import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelBuilder
 import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import fr.vsct.tock.shared.error
 import fr.vsct.tock.shared.loadProperties
 import mu.KotlinLogging
 
@@ -122,15 +123,20 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
             entityRoleMap.clear()
             val tokens = tokenizer.tokenize(tokenizerContext, text)
             expression.entities.forEach { e ->
-                val start =
-                    if (e.start == 0) 0 else tokenizer.tokenize(tokenizerContext, text.substring(0, e.start)).size
-                val end = start + tokenizer.tokenize(tokenizerContext, text.substring(e.start, e.end)).size
-                if (start < tokens.size && end <= tokens.size) {
-                    for (i in start until end) {
-                        tokensIndexes[i] = e
+                try {
+                    val start =
+                        if (e.start == 0) 0 else tokenizer.tokenize(tokenizerContext, text.substring(0, e.start)).size
+                    val end = start + tokenizer.tokenize(tokenizerContext, text.substring(e.start, e.end)).size
+                    if (start < tokens.size && end <= tokens.size) {
+                        for (i in start until end) {
+                            tokensIndexes[i] = e
+                        }
+                    } else {
+                        logger.warn { "entity mismatch for $text" }
+                        return@exp
                     }
-                } else {
-                    logger.warn { "entity mismatch for $text" }
+                } catch (e: Exception) {
+                    logger.error(e)
                     return@exp
                 }
             }
