@@ -1,6 +1,6 @@
 /*
  *  This file is part of the tock-corenlp distribution.
- *  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+ *  (https://github.com/theopenconversationkit/tock-corenlp)
  *  Copyright (c) 2017 VSCT.
  *
  *  tock-corenlp is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.vsct.tock.nlp.stanford
+package ai.tock.nlp.stanford
 
-import fr.vsct.tock.nlp.core.NlpEngineType
-import fr.vsct.tock.nlp.model.TokenizerContext
-import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
-import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.defaultNlpApplicationConfiguration
+import ai.tock.nlp.core.NlpEngineType
+import ai.tock.nlp.model.TokenizerContext
+import ai.tock.nlp.model.service.engine.TokenizerModelHolder
+import ai.tock.nlp.stanford.StanfordModelBuilder.defaultNlpApplicationConfiguration
 import org.junit.jupiter.api.Test
 import java.util.Locale
 import kotlin.test.assertEquals

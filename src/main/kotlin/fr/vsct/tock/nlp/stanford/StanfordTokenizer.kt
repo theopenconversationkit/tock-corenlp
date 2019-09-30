@@ -1,6 +1,6 @@
 /*
  *  This file is part of the tock-corenlp distribution.
- *  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+ *  (https://github.com/theopenconversationkit/tock-corenlp)
  *  Copyright (c) 2017 VSCT.
  *
  *  tock-corenlp is free software: you can redistribute it and/or modify
@@ -16,17 +16,17 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.vsct.tock.nlp.stanford
+package ai.tock.nlp.stanford
 
 import edu.stanford.nlp.international.french.process.FrenchTokenizer
 import edu.stanford.nlp.international.spanish.process.SpanishTokenizer
 import edu.stanford.nlp.ling.CoreLabel
 import edu.stanford.nlp.process.PTBTokenizer
 import edu.stanford.nlp.process.TokenizerFactory
-import fr.vsct.tock.nlp.model.TokenizerContext
-import fr.vsct.tock.nlp.model.service.engine.NlpTokenizer
-import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
-import fr.vsct.tock.shared.error
+import ai.tock.nlp.model.TokenizerContext
+import ai.tock.nlp.model.service.engine.NlpTokenizer
+import ai.tock.nlp.model.service.engine.TokenizerModelHolder
+import ai.tock.shared.error
 import mu.KotlinLogging
 import java.io.StringReader
 import java.util.Locale

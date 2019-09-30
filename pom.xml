@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  This file is part of the tock-corenlp distribution.
-  ~  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+  ~  (https://github.com/theopenconversationkit/tock-corenlp)
   ~  Copyright (c) 2017 VSCT.
   ~
   ~  tock-corenlp is free software: you can redistribute it and/or modify
@@ -22,15 +22,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>fr.vsct.tock</groupId>
+        <groupId>ai.tock</groupId>
         <artifactId>tock-nlp-model</artifactId>
-        <version>19.3.4-SNAPSHOT</version>
+        <version>19.9.0-SNAPSHOT</version>
     </parent>
-    <version>19.3.4-SNAPSHOT</version>
+    <version>19.9.0-SNAPSHOT</version>
     <artifactId>tock-nlp-model-stanford</artifactId>
     <name>Tock NLP CoreNLP</name>
     <description>Stanford CoreNlp implementation of Tock NLP Model</description>
-    <url>https://github.com/voyages-sncf-technologies/tock-corenlp</url>
+    <url>https://github.com/theopenconversationkit/tock-corenlp</url>
 
     <properties>
         <stanford>3.9.2</stanford>
@@ -38,7 +38,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>fr.vsct.tock</groupId>
+            <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-model-service</artifactId>
         </dependency>
 
@@ -49,14 +49,14 @@
         </dependency>
 
         <dependency>
-            <groupId>fr.vsct.tock</groupId>
+            <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-integration-tests</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>fr.vsct.tock</groupId>
+            <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-front-shared</artifactId>
             <scope>test</scope>
         </dependency>
@@ -65,39 +65,39 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>fr.vsct.tock</groupId>
+                <groupId>ai.tock</groupId>
                 <artifactId>tock-nlp-model-shared</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
-                <groupId>fr.vsct.tock</groupId>
+                <groupId>ai.tock</groupId>
                 <artifactId>tock-shared</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
-                <groupId>fr.vsct.tock</groupId>
+                <groupId>ai.tock</groupId>
                 <artifactId>tock-nlp-core-shared</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
-                <groupId>fr.vsct.tock</groupId>
+                <groupId>ai.tock</groupId>
                 <artifactId>tock-nlp-entity-value</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
-                <groupId>fr.vsct.tock</groupId>
+                <groupId>ai.tock</groupId>
                 <artifactId>tock-nlp-model-service</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
-                <groupId>fr.vsct.tock</groupId>
+                <groupId>ai.tock</groupId>
                 <artifactId>tock-nlp-integration-tests</artifactId>
                 <type>test-jar</type>
                 <scope>test</scope>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
-                <groupId>fr.vsct.tock</groupId>
+                <groupId>ai.tock</groupId>
                 <artifactId>tock-nlp-front-shared</artifactId>
                 <scope>test</scope>
                 <version>${project.parent.version}</version>
@@ -137,9 +137,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:voyages-sncf-technologies/tock-corenlp.git</connection>
-        <developerConnection>scm:git:git@github.com:voyages-sncf-technologies/tock-corenlp.git</developerConnection>
-        <url>git@github.com:voyages-sncf-technologies/tock-corenlp.git</url>
+        <connection>scm:git:git@github.com:theopenconversationkit/tock-corenlp.git</connection>
+        <developerConnection>scm:git:git@github.com:theopenconversationkit/tock-corenlp.git</developerConnection>
+        <url>git@github.com:theopenconversationkit/tock-corenlp.git</url>
         <tag>HEAD</tag>
     </scm>
 

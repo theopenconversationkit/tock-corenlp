@@ -1,14 +1,14 @@
-package fr.vsct.tock.nlp.stanford
+package ai.tock.nlp.stanford
 
-import fr.vsct.tock.nlp.core.Application
-import fr.vsct.tock.nlp.core.Entity
-import fr.vsct.tock.nlp.core.EntityType
-import fr.vsct.tock.nlp.core.Intent
-import fr.vsct.tock.nlp.core.NlpEngineType
-import fr.vsct.tock.nlp.integration.IntegrationConfiguration
-import fr.vsct.tock.nlp.model.IntentContext
-import fr.vsct.tock.nlp.model.TokenizerContext
-import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import ai.tock.nlp.core.Application
+import ai.tock.nlp.core.Entity
+import ai.tock.nlp.core.EntityType
+import ai.tock.nlp.core.Intent
+import ai.tock.nlp.core.NlpEngineType
+import ai.tock.nlp.integration.IntegrationConfiguration
+import ai.tock.nlp.model.IntentContext
+import ai.tock.nlp.model.TokenizerContext
+import ai.tock.nlp.model.service.engine.TokenizerModelHolder
 import org.junit.jupiter.api.Test
 import java.util.Locale
 import kotlin.test.assertFalse

@@ -1,6 +1,6 @@
 /*
  *  This file is part of the tock-corenlp distribution.
- *  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+ *  (https://github.com/theopenconversationkit/tock-corenlp)
  *  Copyright (c) 2017 VSCT.
  *
  *  tock-corenlp is free software: you can redistribute it and/or modify
@@ -16,23 +16,23 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.vsct.tock.nlp.stanford
+package ai.tock.nlp.stanford
 
 import edu.stanford.nlp.ie.crf.CRFClassifier
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.ling.CoreLabel
-import fr.vsct.tock.nlp.core.Entity
-import fr.vsct.tock.nlp.core.EntityRecognition
-import fr.vsct.tock.nlp.core.EntityValue
-import fr.vsct.tock.nlp.core.IntOpenRange
-import fr.vsct.tock.nlp.model.EntityCallContext
-import fr.vsct.tock.nlp.model.EntityCallContextForEntity
-import fr.vsct.tock.nlp.model.EntityCallContextForIntent
-import fr.vsct.tock.nlp.model.EntityCallContextForSubEntities
-import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
-import fr.vsct.tock.nlp.model.service.engine.NlpEntityClassifier
-import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.ADJACENT_ENTITY_MARKER
-import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.TAB
+import ai.tock.nlp.core.Entity
+import ai.tock.nlp.core.EntityRecognition
+import ai.tock.nlp.core.EntityValue
+import ai.tock.nlp.core.IntOpenRange
+import ai.tock.nlp.model.EntityCallContext
+import ai.tock.nlp.model.EntityCallContextForEntity
+import ai.tock.nlp.model.EntityCallContextForIntent
+import ai.tock.nlp.model.EntityCallContextForSubEntities
+import ai.tock.nlp.model.service.engine.EntityModelHolder
+import ai.tock.nlp.model.service.engine.NlpEntityClassifier
+import ai.tock.nlp.stanford.StanfordModelBuilder.ADJACENT_ENTITY_MARKER
+import ai.tock.nlp.stanford.StanfordModelBuilder.TAB
 import mu.KotlinLogging
 import java.util.Arrays
 

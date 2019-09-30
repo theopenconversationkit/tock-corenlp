@@ -1,6 +1,6 @@
 /*
  *  This file is part of the tock-corenlp distribution.
- *  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+ *  (https://github.com/theopenconversationkit/tock-corenlp)
  *  Copyright (c) 2017 VSCT.
  *
  *  tock-corenlp is free software: you can redistribute it and/or modify
@@ -16,26 +16,26 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.vsct.tock.nlp.stanford
+package ai.tock.nlp.stanford
 
 import edu.stanford.nlp.ie.crf.CRFClassifier
 import edu.stanford.nlp.ling.CoreLabel
-import fr.vsct.tock.nlp.core.Entity
-import fr.vsct.tock.nlp.core.EntityRecognition
-import fr.vsct.tock.nlp.core.EntityType
-import fr.vsct.tock.nlp.core.EntityValue
-import fr.vsct.tock.nlp.core.Intent
-import fr.vsct.tock.nlp.core.NlpEngineType
-import fr.vsct.tock.nlp.core.sample.SampleContext
-import fr.vsct.tock.nlp.core.sample.SampleEntity
-import fr.vsct.tock.nlp.core.sample.SampleExpression
-import fr.vsct.tock.nlp.model.EntityBuildContextForIntent
-import fr.vsct.tock.nlp.model.EntityCallContextForIntent
-import fr.vsct.tock.nlp.model.TokenizerContext
-import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
-import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
-import fr.vsct.tock.nlp.stanford.StanfordModelBuilder.defaultNlpApplicationConfiguration
-import fr.vsct.tock.shared.defaultLocale
+import ai.tock.nlp.core.Entity
+import ai.tock.nlp.core.EntityRecognition
+import ai.tock.nlp.core.EntityType
+import ai.tock.nlp.core.EntityValue
+import ai.tock.nlp.core.Intent
+import ai.tock.nlp.core.NlpEngineType
+import ai.tock.nlp.core.sample.SampleContext
+import ai.tock.nlp.core.sample.SampleEntity
+import ai.tock.nlp.core.sample.SampleExpression
+import ai.tock.nlp.model.EntityBuildContextForIntent
+import ai.tock.nlp.model.EntityCallContextForIntent
+import ai.tock.nlp.model.TokenizerContext
+import ai.tock.nlp.model.service.engine.EntityModelHolder
+import ai.tock.nlp.model.service.engine.TokenizerModelHolder
+import ai.tock.nlp.stanford.StanfordModelBuilder.defaultNlpApplicationConfiguration
+import ai.tock.shared.defaultLocale
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 import java.util.Locale

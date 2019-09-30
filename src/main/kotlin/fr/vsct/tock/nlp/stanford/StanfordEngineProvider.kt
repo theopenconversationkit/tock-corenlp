@@ -1,6 +1,6 @@
 /*
  *  This file is part of the tock-corenlp distribution.
- *  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+ *  (https://github.com/theopenconversationkit/tock-corenlp)
  *  Copyright (c) 2017 VSCT.
  *
  *  tock-corenlp is free software: you can redistribute it and/or modify
@@ -16,18 +16,18 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.vsct.tock.nlp.stanford
+package ai.tock.nlp.stanford
 
-import fr.vsct.tock.nlp.core.NlpEngineType
-import fr.vsct.tock.nlp.model.service.engine.EntityClassifier
-import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
-import fr.vsct.tock.nlp.model.service.engine.IntentClassifier
-import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
-import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelBuilder
-import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelIo
-import fr.vsct.tock.nlp.model.service.engine.NlpEngineProvider
-import fr.vsct.tock.nlp.model.service.engine.Tokenizer
-import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
+import ai.tock.nlp.core.NlpEngineType
+import ai.tock.nlp.model.service.engine.EntityClassifier
+import ai.tock.nlp.model.service.engine.EntityModelHolder
+import ai.tock.nlp.model.service.engine.IntentClassifier
+import ai.tock.nlp.model.service.engine.IntentModelHolder
+import ai.tock.nlp.model.service.engine.NlpEngineModelBuilder
+import ai.tock.nlp.model.service.engine.NlpEngineModelIo
+import ai.tock.nlp.model.service.engine.NlpEngineProvider
+import ai.tock.nlp.model.service.engine.Tokenizer
+import ai.tock.nlp.model.service.engine.TokenizerModelHolder
 
 /**
  *

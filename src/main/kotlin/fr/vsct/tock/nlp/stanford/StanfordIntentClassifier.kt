@@ -1,6 +1,6 @@
 /*
  *  This file is part of the tock-corenlp distribution.
- *  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+ *  (https://github.com/theopenconversationkit/tock-corenlp)
  *  Copyright (c) 2017 VSCT.
  *
  *  tock-corenlp is free software: you can redistribute it and/or modify
@@ -16,14 +16,14 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.vsct.tock.nlp.stanford
+package ai.tock.nlp.stanford
 
 import edu.stanford.nlp.stats.Counters
-import fr.vsct.tock.nlp.core.Intent
-import fr.vsct.tock.nlp.core.IntentClassification
-import fr.vsct.tock.nlp.model.IntentContext
-import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
-import fr.vsct.tock.nlp.model.service.engine.NlpIntentClassifier
+import ai.tock.nlp.core.Intent
+import ai.tock.nlp.core.IntentClassification
+import ai.tock.nlp.model.IntentContext
+import ai.tock.nlp.model.service.engine.IntentModelHolder
+import ai.tock.nlp.model.service.engine.NlpIntentClassifier
 
 /**
  *

@@ -1,6 +1,6 @@
 /*
  *  This file is part of the tock-corenlp distribution.
- *  (https://github.com/voyages-sncf-technologies/tock-corenlp)
+ *  (https://github.com/theopenconversationkit/tock-corenlp)
  *  Copyright (c) 2017 VSCT.
  *
  *  tock-corenlp is free software: you can redistribute it and/or modify
@@ -16,26 +16,26 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.vsct.tock.nlp.stanford
+package ai.tock.nlp.stanford
 
 import edu.stanford.nlp.classify.ColumnDataClassifier
 import edu.stanford.nlp.classify.Dataset
 import edu.stanford.nlp.ie.crf.CRFClassifier
 import edu.stanford.nlp.ling.CoreLabel
 import edu.stanford.nlp.objectbank.ObjectBank
-import fr.vsct.tock.nlp.core.configuration.NlpApplicationConfiguration
-import fr.vsct.tock.nlp.core.configuration.NlpModelConfiguration
-import fr.vsct.tock.nlp.core.sample.SampleEntity
-import fr.vsct.tock.nlp.core.sample.SampleExpression
-import fr.vsct.tock.nlp.model.EntityBuildContext
-import fr.vsct.tock.nlp.model.IntentContext
-import fr.vsct.tock.nlp.model.TokenizerContext
-import fr.vsct.tock.nlp.model.service.engine.EntityModelHolder
-import fr.vsct.tock.nlp.model.service.engine.IntentModelHolder
-import fr.vsct.tock.nlp.model.service.engine.NlpEngineModelBuilder
-import fr.vsct.tock.nlp.model.service.engine.TokenizerModelHolder
-import fr.vsct.tock.shared.error
-import fr.vsct.tock.shared.loadProperties
+import ai.tock.nlp.core.configuration.NlpApplicationConfiguration
+import ai.tock.nlp.core.configuration.NlpModelConfiguration
+import ai.tock.nlp.core.sample.SampleEntity
+import ai.tock.nlp.core.sample.SampleExpression
+import ai.tock.nlp.model.EntityBuildContext
+import ai.tock.nlp.model.IntentContext
+import ai.tock.nlp.model.TokenizerContext
+import ai.tock.nlp.model.service.engine.EntityModelHolder
+import ai.tock.nlp.model.service.engine.IntentModelHolder
+import ai.tock.nlp.model.service.engine.NlpEngineModelBuilder
+import ai.tock.nlp.model.service.engine.TokenizerModelHolder
+import ai.tock.shared.error
+import ai.tock.shared.loadProperties
 import mu.KotlinLogging
 
 
