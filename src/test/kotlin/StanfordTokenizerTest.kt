@@ -141,5 +141,12 @@ internal class StanfordTokenizerTest {
         assertEquals("mars", tokens[4])
     }
 
+    @Test
+    fun tokenize_StringWithUnderscore_shouldSplitTokens() {
+        val tokens = tokenizer.tokenize(context, "bordeaux st-jean_gare montparnasse  -paris  AR  le 20/27/2018 au 23/07/ 2018")
+        assertEquals(22, tokens.size)
+        assertEquals("_", tokens[4])
+    }
+
 
 }

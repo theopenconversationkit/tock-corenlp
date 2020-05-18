@@ -72,7 +72,7 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
 
     override fun tokenize(context: TokenizerContext, text: String): Array<String> {
         val rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
-            val word = coreLabel.word()
+            val word = coreLabel.originalText()
             splitSeparators(
                 word,
                 model.configuration.tokenizerConfiguration.properties.getProperty("tock_stanford_tokens_separators")

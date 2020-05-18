@@ -18,8 +18,6 @@
 
 package ai.tock.nlp.stanford
 
-import edu.stanford.nlp.ie.crf.CRFClassifier
-import edu.stanford.nlp.ling.CoreLabel
 import ai.tock.nlp.core.Entity
 import ai.tock.nlp.core.EntityRecognition
 import ai.tock.nlp.core.EntityType
@@ -36,6 +34,8 @@ import ai.tock.nlp.model.service.engine.EntityModelHolder
 import ai.tock.nlp.model.service.engine.TokenizerModelHolder
 import ai.tock.nlp.stanford.StanfordModelBuilder.defaultNlpApplicationConfiguration
 import ai.tock.shared.defaultLocale
+import edu.stanford.nlp.ie.crf.CRFClassifier
+import edu.stanford.nlp.ling.CoreLabel
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 import java.util.Locale
@@ -180,6 +180,144 @@ class StanfordEntityClassifierTest {
             listOf(
                 EntityRecognition(EntityValue(0, 5, entity), .835),
                 EntityRecognition(EntityValue(6, 11, entity), .835)
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `complex expression must not fail`() {
+        val entityType = EntityType("type")
+        val entity = Entity(entityType, "a")
+        val entityB = Entity(entityType, "b")
+        val intent = Intent("test", listOf(entity, entityB))
+        val model = StanfordModelBuilder.buildEntityModel(
+            EntityBuildContextForIntent(
+                intent,
+                Locale.FRENCH,
+                NlpEngineType.stanford,
+                "app"
+            ),
+            defaultNlpApplicationConfiguration(),
+            listOf(
+                SampleExpression(
+                    "bordeaux st-jean_gare montparnasse  -paris  AR  le 20/27/2018 au 23/07/ 2018",
+                    Intent("intent", emptyList()),
+                    listOf(
+                        SampleEntity(
+                            Entity(entityType, "a"),
+                            emptyList(),
+                            0,
+                            16
+                        ),
+                        SampleEntity(
+                            entityB,
+                            emptyList(),
+                            17,
+                            42
+                        ),
+                        SampleEntity(
+                            entityB,
+                            emptyList(),
+                            44,
+                            46
+                        ),
+                        SampleEntity(
+                            Entity(entityType, "a"),
+                            emptyList(),
+                            48,
+                            61
+                        ),
+                        SampleEntity(
+                            entityB,
+                            emptyList(),
+                            65,
+                            76
+                        )
+                    ),
+                    SampleContext()
+                ),
+                SampleExpression(
+                    "12/11 13/11",
+                    Intent("intent", emptyList()),
+                    listOf(
+                        SampleEntity(
+                            entity,
+                            emptyList(),
+                            0,
+                            5
+                        ),
+                        SampleEntity(
+                            entity,
+                            emptyList(),
+                            6,
+                            11
+                        )
+                    ),
+                    SampleContext()
+                ),
+                SampleExpression(
+                    "13/11 14/11",
+                    Intent("intent", emptyList()),
+                    listOf(
+                        SampleEntity(
+                            entity,
+                            emptyList(),
+                            0,
+                            5
+                        ),
+                        SampleEntity(
+                            entity,
+                            emptyList(),
+                            6,
+                            11
+                        )
+                    ),
+                    SampleContext()
+                ),
+                SampleExpression(
+                    "15/11 16/11",
+                    Intent("intent", emptyList()),
+                    listOf(
+                        SampleEntity(
+                            entity,
+                            emptyList(),
+                            0,
+                            5
+                        ),
+                        SampleEntity(
+                            entity,
+                            emptyList(),
+                            6,
+                            11
+                        )
+                    ),
+                    SampleContext()
+                )
+            )
+        )
+
+        val classifier =
+            StanfordEntityClassifier(
+                model
+            )
+        val context = EntityCallContextForIntent(
+            intent,
+            defaultLocale,
+            NlpEngineType.stanford,
+            "test",
+            ZonedDateTime.now()
+        )
+
+        val result = classifier.classifyEntities(context, "bordeaux st-jean_gare montparnasse  -paris  AR  le 20/27/2018 au 23/07/ 2018", tokenizer.tokenize(tokenizerContext, "bordeaux st-jean_gare montparnasse  -paris  AR  le 20/27/2018 au 23/07/ 2018"))
+
+        assertEquals(
+            listOf(
+                EntityRecognition(EntityValue(0, 16, entity), .958),
+                EntityRecognition(EntityValue(17, 42, entityB), .958),
+                EntityRecognition(EntityValue(44, 46, entityB), .958),
+                EntityRecognition(EntityValue(48, 61, entity), .958),
+                EntityRecognition(EntityValue(65, 76, entityB), .958)
             ),
             result
         )

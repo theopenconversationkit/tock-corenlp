@@ -18,11 +18,6 @@
 
 package ai.tock.nlp.stanford
 
-import edu.stanford.nlp.classify.ColumnDataClassifier
-import edu.stanford.nlp.classify.Dataset
-import edu.stanford.nlp.ie.crf.CRFClassifier
-import edu.stanford.nlp.ling.CoreLabel
-import edu.stanford.nlp.objectbank.ObjectBank
 import ai.tock.nlp.core.configuration.NlpApplicationConfiguration
 import ai.tock.nlp.core.configuration.NlpModelConfiguration
 import ai.tock.nlp.core.sample.SampleEntity
@@ -34,8 +29,12 @@ import ai.tock.nlp.model.service.engine.EntityModelHolder
 import ai.tock.nlp.model.service.engine.IntentModelHolder
 import ai.tock.nlp.model.service.engine.NlpEngineModelBuilder
 import ai.tock.nlp.model.service.engine.TokenizerModelHolder
-import ai.tock.shared.error
 import ai.tock.shared.loadProperties
+import edu.stanford.nlp.classify.ColumnDataClassifier
+import edu.stanford.nlp.classify.Dataset
+import edu.stanford.nlp.ie.crf.CRFClassifier
+import edu.stanford.nlp.ling.CoreLabel
+import edu.stanford.nlp.objectbank.ObjectBank
 import mu.KotlinLogging
 
 
@@ -114,16 +113,16 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         val tokensIndexes: MutableMap<Int, SampleEntity> = HashMap()
         val entityRoleMap: MutableMap<SampleEntity, String> = HashMap()
         expressions.forEach exp@{ expression ->
-            val text = expression.text
-            if (text.contains("\n") || text.contains("\t")) {
-                logger.warn { "expression $text contains \\n or \\t!!! - skipped" }
-                return@exp
-            }
-            tokensIndexes.clear()
-            entityRoleMap.clear()
-            val tokens = tokenizer.tokenize(tokenizerContext, text)
-            expression.entities.forEach { e ->
-                try {
+            try {
+                val text = expression.text
+                if (text.contains("\n") || text.contains("\t")) {
+                    logger.warn { "expression $text contains \\n or \\t!!! - skipped" }
+                    return@exp
+                }
+                tokensIndexes.clear()
+                entityRoleMap.clear()
+                val tokens = tokenizer.tokenize(tokenizerContext, text)
+                expression.entities.forEach { e ->
                     val start =
                         if (e.start == 0) 0 else tokenizer.tokenize(tokenizerContext, text.substring(0, e.start)).size
                     val end = start + tokenizer.tokenize(tokenizerContext, text.substring(e.start, e.end)).size
@@ -135,39 +134,39 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                         logger.warn { "entity mismatch for $text" }
                         return@exp
                     }
-                } catch (e: Exception) {
-                    logger.error(e)
-                    return@exp
                 }
-            }
 
-            tokens.forEachIndexed { index, token ->
-                val entity = tokensIndexes[index]
+                tokens.forEachIndexed { index, token ->
+                    val entity = tokensIndexes[index]
 
-                val role = when {
-                    entity == null -> "O"
-                    index == 0 -> entity.definition.role
-                    else -> {
-                        //deal with adjacent entities
-                        val alreadyKnown = entityRoleMap[entity]
-                        if (alreadyKnown != null) {
-                            alreadyKnown
-                        } else {
-                            val r = tokensIndexes[index - 1]
-                                ?.takeIf { entityRoleMap[it] == entity.definition.role }
-                                ?.let { "$ADJACENT_ENTITY_MARKER${it.definition.role}" }
-                                ?: entity.definition.role
-                            entityRoleMap[entity] = r
-                            r
+                    val role = when {
+                        entity == null -> "O"
+                        index == 0 -> entity.definition.role
+                        else -> {
+                            //deal with adjacent entities
+                            val alreadyKnown = entityRoleMap[entity]
+                            if (alreadyKnown != null) {
+                                alreadyKnown
+                            } else {
+                                val r = tokensIndexes[index - 1]
+                                    ?.takeIf { entityRoleMap[it] == entity.definition.role }
+                                    ?.let { "$ADJACENT_ENTITY_MARKER${it.definition.role}" }
+                                    ?: entity.definition.role
+                                entityRoleMap[entity] = r
+                                r
+                            }
                         }
                     }
+                    sb.append(token)
+                    sb.append(TAB)
+                    sb.appendln(role)
                 }
-                sb.append(token)
-                sb.append(TAB)
-                sb.appendln(role)
+                sb.appendln()
+                logger.trace { "$text ->\n$sb" }
+            } catch (e: Exception) {
+                logger.error("error with $expression", e)
+                return@exp
             }
-            sb.appendln()
-            logger.trace { "$text ->\n$sb" }
         }
 
         return sb.toString()

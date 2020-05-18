@@ -18,9 +18,6 @@
 
 package ai.tock.nlp.stanford
 
-import edu.stanford.nlp.ie.crf.CRFClassifier
-import edu.stanford.nlp.ling.CoreAnnotations
-import edu.stanford.nlp.ling.CoreLabel
 import ai.tock.nlp.core.Entity
 import ai.tock.nlp.core.EntityRecognition
 import ai.tock.nlp.core.EntityValue
@@ -33,8 +30,10 @@ import ai.tock.nlp.model.service.engine.EntityModelHolder
 import ai.tock.nlp.model.service.engine.NlpEntityClassifier
 import ai.tock.nlp.stanford.StanfordModelBuilder.ADJACENT_ENTITY_MARKER
 import ai.tock.nlp.stanford.StanfordModelBuilder.TAB
+import edu.stanford.nlp.ie.crf.CRFClassifier
+import edu.stanford.nlp.ling.CoreAnnotations
+import edu.stanford.nlp.ling.CoreLabel
 import mu.KotlinLogging
-import java.util.Arrays
 
 
 internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityClassifier(model) {
@@ -140,7 +139,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
                 }
             }
         } catch (e: Exception) {
-            logger.error("error with $text and ${Arrays.toString(tokens)}", e)
+            logger.error("error with $text and ${tokens.contentToString()}", e)
             emptyList()
         }
     }
