@@ -34,7 +34,7 @@ import java.io.OutputStream
 internal object StanfordModelIo : NlpEngineModelIo {
 
     override fun loadTokenizerModel(input: NlpModelStream): Any {
-        TODO()
+        error("loading tokenizer model is not supported")
     }
 
     override fun loadIntentModel(input: NlpModelStream): Any =
@@ -60,7 +60,7 @@ internal object StanfordModelIo : NlpEngineModelIo {
         }
 
     override fun copyTokenizerModel(model: Any, output: OutputStream) {
-        TODO()
+        error("copying tokenizer model is not supported")
     }
 
     override fun copyIntentModel(model: Any, output: OutputStream) {

@@ -57,7 +57,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
     ): List<EntityRecognition> {
         return when (context) {
             is EntityCallContextForIntent -> classifyEntities(context, text, tokens)
-            is EntityCallContextForEntity -> TODO()
+            is EntityCallContextForEntity -> error("EntityCallContextForEntity is not supported")
             is EntityCallContextForSubEntities -> classifyEntities(context, text, tokens)
         }
     }
