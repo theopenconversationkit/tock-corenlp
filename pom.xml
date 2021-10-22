@@ -25,7 +25,7 @@
         <artifactId>tock-nlp-model</artifactId>
         <version>21.9.1-SNAPSHOT</version>
     </parent>
-    <version>21.9.1-SNAPSHOT</version>
+    <version>21.9.1</version>
     <artifactId>tock-nlp-model-stanford</artifactId>
     <name>Tock NLP CoreNLP</name>
     <description>Stanford CoreNlp implementation of Tock NLP Model</description>
