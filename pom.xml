@@ -25,14 +25,14 @@
         <artifactId>tock-nlp-model</artifactId>
         <version>22.3.3-SNAPSHOT</version>
     </parent>
-    <version>22.3.3-SNAPSHOT</version>
+    <version>22.3.3</version>
     <artifactId>tock-nlp-model-stanford</artifactId>
     <name>Tock NLP CoreNLP</name>
     <description>Stanford CoreNlp implementation of Tock NLP Model</description>
     <url>https://github.com/theopenconversationkit/tock-corenlp</url>
 
     <properties>
-        <stanford>4.2.0</stanford>
+        <stanford>4.5.1</stanford>
     </properties>
 
     <dependencies>
