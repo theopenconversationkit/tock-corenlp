@@ -23,7 +23,7 @@
     <parent>
         <groupId>ai.tock</groupId>
         <artifactId>tock-nlp-model</artifactId>
-        <version>23.3.5-SNAPSHOT</version>
+        <version>23.9.0</version>
     </parent>
     <version>23.3.5-SNAPSHOT</version>
     <artifactId>tock-nlp-model-stanford</artifactId>
@@ -32,7 +32,7 @@
     <url>https://github.com/theopenconversationkit/tock-corenlp</url>
 
     <properties>
-        <stanford>4.5.4</stanford>
+        <stanford>4.5.5</stanford>
     </properties>
 
     <dependencies>
