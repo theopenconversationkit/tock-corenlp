@@ -23,7 +23,7 @@
     <parent>
         <groupId>ai.tock</groupId>
         <artifactId>tock-nlp-model</artifactId>
-        <version>23.9.1-SNAPSHOT</version>
+        <version>23.9.1</version>
     </parent>
     <version>23.9.1-SNAPSHOT</version>
     <artifactId>tock-nlp-model-stanford</artifactId>
@@ -116,14 +116,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>bintray-tock</id>
-            <name>bintray</name>
-            <url>https://dl.bintray.com/tock/tock</url>
-        </repository>
     </repositories>
 
     <licenses>
@@ -141,26 +133,5 @@
         <url>git@github.com:theopenconversationkit/tock-corenlp.git</url>
         <tag>HEAD</tag>
     </scm>
-
-    <profiles>
-        <profile>
-            <id>milestone</id>
-            <activation>
-                <property>
-                    <name>milestone</name>
-                </property>
-            </activation>
-            <properties>
-                <gpg.skip>false</gpg.skip>
-            </properties>
-            <distributionManagement>
-                <repository>
-                    <id>bintray-tock</id>
-                    <name>tock-build</name>
-                    <url>https://api.bintray.com/maven/tock/tock/tock-stanford/;publish=1;override=1</url>
-                </repository>
-            </distributionManagement>
-        </profile>
-    </profiles>
 
 </project>
