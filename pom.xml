@@ -25,7 +25,7 @@
         <artifactId>tock-nlp-model</artifactId>
         <version>24.9.1</version>
     </parent>
-    <version>24.9.1-SNAPSHOT</version>
+    <version>24.9.1</version>
     <artifactId>tock-nlp-model-stanford</artifactId>
     <name>Tock NLP CoreNLP</name>
     <description>Stanford CoreNlp implementation of Tock NLP Model</description>
@@ -131,7 +131,7 @@
         <connection>scm:git:git@github.com:theopenconversationkit/tock-corenlp.git</connection>
         <developerConnection>scm:git:git@github.com:theopenconversationkit/tock-corenlp.git</developerConnection>
         <url>git@github.com:theopenconversationkit/tock-corenlp.git</url>
-        <tag>HEAD</tag>
+        <tag>tock-24.9.1</tag>
     </scm>
 
 </project>
