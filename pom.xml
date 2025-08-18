@@ -25,7 +25,7 @@
         <artifactId>tock-nlp-model</artifactId>
         <version>25.3.10</version>
     </parent>
-    <version>25.3.10-SNAPSHOT</version>
+    <version>25.3.11-SNAPSHOT</version>
     <artifactId>tock-nlp-model-stanford</artifactId>
     <name>Tock NLP CoreNLP</name>
     <description>Stanford CoreNlp implementation of Tock NLP Model</description>
@@ -39,6 +39,7 @@
         <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-model-service</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
@@ -52,12 +53,14 @@
             <artifactId>tock-nlp-integration-tests</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-front-shared</artifactId>
             <scope>test</scope>
+            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 
@@ -103,6 +106,16 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <developers>
+        <developer>
+            <id>jburet_vsct</id>
+            <name>Julien Buret</name>
+            <email>jburet@voyages-sncf.com</email>
+            <organization>theopenconversationkit</organization>
+            <organizationUrl>https://doc.tock.ai</organizationUrl>
+        </developer>
+    </developers>
 
     <licenses>
         <license>
