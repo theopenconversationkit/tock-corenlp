@@ -159,9 +159,9 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                     }
                     sb.append(token)
                     sb.append(TAB)
-                    sb.appendln(role)
+                    sb.appendLine(role)
                 }
-                sb.appendln()
+                sb.appendLine()
                 logger.trace { "$text ->\n$sb" }
             } catch (e: Exception) {
                 logger.error("error with $expression", e)
