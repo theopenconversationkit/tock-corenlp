@@ -108,6 +108,16 @@
         </dependencies>
     </dependencyManagement>
 
+    <developers>
+        <developer>
+            <id>jburet</id>
+            <name>Julien Buret</name>
+            <email>zigzago@litote.org</email>
+            <organization>theopenconversationkit</organization>
+            <organizationUrl>https://doc.tock.ai</organizationUrl>
+        </developer>
+    </developers>
+
     <licenses>
         <license>
             <name>GNU General Public License (GPL) version 3.0</name>
