@@ -37,12 +37,10 @@ import edu.stanford.nlp.ling.CoreLabel
 import edu.stanford.nlp.objectbank.ObjectBank
 import mu.KotlinLogging
 
-
 /**
  *
  */
 internal object StanfordModelBuilder : NlpEngineModelBuilder {
-
     private val logger = KotlinLogging.logger {}
 
     const val TAB = "\t"
@@ -51,7 +49,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
     override fun buildTokenizerModel(
         context: TokenizerContext,
         configuration: NlpApplicationConfiguration,
-        expressions: List<SampleExpression>
+        expressions: List<SampleExpression>,
     ): TokenizerModelHolder {
         return TokenizerModelHolder(context.language, configuration)
     }
@@ -68,7 +66,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
     override fun buildIntentModel(
         context: IntentContext,
         configuration: NlpApplicationConfiguration,
-        expressions: List<SampleExpression>
+        expressions: List<SampleExpression>,
     ): IntentModelHolder {
         val cdc = ColumnDataClassifier(configuration.intentConfiguration.properties)
         val dataset = Dataset<String, String>()
@@ -82,15 +80,16 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
     override fun buildEntityModel(
         context: EntityBuildContext,
         configuration: NlpApplicationConfiguration,
-        expressions: List<SampleExpression>
+        expressions: List<SampleExpression>,
     ): EntityModelHolder {
         val crfClassifier = CRFClassifier<CoreLabel>(configuration.entityConfiguration.properties)
         val trainingData = getEntityTrainData(context, configuration, expressions)
         try {
-            val transformedData: ObjectBank<MutableList<CoreLabel>> = crfClassifier.makeObjectBankFromString(
-                trainingData,
-                crfClassifier.defaultReaderAndWriter()
-            )
+            val transformedData: ObjectBank<MutableList<CoreLabel>> =
+                crfClassifier.makeObjectBankFromString(
+                    trainingData,
+                    crfClassifier.defaultReaderAndWriter(),
+                )
             crfClassifier.train(transformedData)
             return EntityModelHolder(crfClassifier, configuration)
         } catch (e: Exception) {
@@ -104,7 +103,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
     internal fun getEntityTrainData(
         context: EntityBuildContext,
         configuration: NlpApplicationConfiguration,
-        expressions: List<SampleExpression>
+        expressions: List<SampleExpression>,
     ): String {
         val tokenizer =
             StanfordEngineProvider.getStanfordTokenizer(TokenizerModelHolder(context.language, configuration))
@@ -139,24 +138,26 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
                 tokens.forEachIndexed { index, token ->
                     val entity = tokensIndexes[index]
 
-                    val role = when {
-                        entity == null -> "O"
-                        index == 0 -> entity.definition.role
-                        else -> {
-                            //deal with adjacent entities
-                            val alreadyKnown = entityRoleMap[entity]
-                            if (alreadyKnown != null) {
-                                alreadyKnown
-                            } else {
-                                val r = tokensIndexes[index - 1]
-                                    ?.takeIf { entityRoleMap[it] == entity.definition.role }
-                                    ?.let { "$ADJACENT_ENTITY_MARKER${it.definition.role}" }
-                                    ?: entity.definition.role
-                                entityRoleMap[entity] = r
-                                r
+                    val role =
+                        when {
+                            entity == null -> "O"
+                            index == 0 -> entity.definition.role
+                            else -> {
+                                // deal with adjacent entities
+                                val alreadyKnown = entityRoleMap[entity]
+                                if (alreadyKnown != null) {
+                                    alreadyKnown
+                                } else {
+                                    val r =
+                                        tokensIndexes[index - 1]
+                                            ?.takeIf { entityRoleMap[it] == entity.definition.role }
+                                            ?.let { "$ADJACENT_ENTITY_MARKER${it.definition.role}" }
+                                            ?: entity.definition.role
+                                    entityRoleMap[entity] = r
+                                    r
+                                }
                             }
                         }
-                    }
                     sb.append(token)
                     sb.append(TAB)
                     sb.appendLine(role)

@@ -18,29 +18,33 @@
 
 package ai.tock.nlp.stanford
 
-import edu.stanford.nlp.stats.Counters
 import ai.tock.nlp.core.Intent
 import ai.tock.nlp.core.IntentClassification
 import ai.tock.nlp.model.IntentContext
 import ai.tock.nlp.model.service.engine.IntentModelHolder
 import ai.tock.nlp.model.service.engine.NlpIntentClassifier
+import edu.stanford.nlp.stats.Counters
 
 /**
  *
  */
 internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentClassifier(model) {
-
     companion object {
-        val emptyClassification = object : IntentClassification {
-            override fun probability(): Double = 0.0
+        val emptyClassification =
+            object : IntentClassification {
+                override fun probability(): Double = 0.0
 
-            override fun hasNext(): Boolean = false
+                override fun hasNext(): Boolean = false
 
-            override fun next(): Intent = throw NoSuchElementException()
-        }
+                override fun next(): Intent = throw NoSuchElementException()
+            }
     }
 
-    override fun classifyIntent(context: IntentContext, text: String, tokens: Array<String>): IntentClassification {
+    override fun classifyIntent(
+        context: IntentContext,
+        text: String,
+        tokens: Array<String>,
+    ): IntentClassification {
         return with(model) {
             if (!model.application.intents.isEmpty()) {
                 with(nativeModel as StanfordIntentModel) {
@@ -49,7 +53,6 @@ internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentCla
                     val logSum = Counters.logSum(scores)
                     val iterator = scores.entrySet().sortedByDescending { it.value }.iterator()
                     return object : IntentClassification {
-
                         var probability = 0.0
 
                         override fun probability(): Double = probability
@@ -69,5 +72,4 @@ internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentCla
             }
         }
     }
-
 }

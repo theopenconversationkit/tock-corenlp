@@ -30,7 +30,6 @@ import kotlin.test.assertEquals
  *
  */
 internal class StanfordTokenizerTest {
-
     val tokenizer = StanfordTokenizer(TokenizerModelHolder(Locale.FRENCH, defaultNlpApplicationConfiguration()))
     val context = TokenizerContext(Locale.FRENCH, NlpEngineType.stanford, "app")
 
@@ -147,6 +146,4 @@ internal class StanfordTokenizerTest {
         assertEquals(22, tokens.size)
         assertEquals("_", tokens[4])
     }
-
-
 }

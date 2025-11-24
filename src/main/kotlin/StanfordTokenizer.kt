@@ -18,15 +18,15 @@
 
 package ai.tock.nlp.stanford
 
+import ai.tock.nlp.model.TokenizerContext
+import ai.tock.nlp.model.service.engine.NlpTokenizer
+import ai.tock.nlp.model.service.engine.TokenizerModelHolder
+import ai.tock.shared.error
 import edu.stanford.nlp.international.french.process.FrenchTokenizer
 import edu.stanford.nlp.international.spanish.process.SpanishTokenizer
 import edu.stanford.nlp.ling.CoreLabel
 import edu.stanford.nlp.process.PTBTokenizer
 import edu.stanford.nlp.process.TokenizerFactory
-import ai.tock.nlp.model.TokenizerContext
-import ai.tock.nlp.model.service.engine.NlpTokenizer
-import ai.tock.nlp.model.service.engine.TokenizerModelHolder
-import ai.tock.shared.error
 import mu.KotlinLogging
 import java.io.StringReader
 import java.util.Locale
@@ -36,10 +36,10 @@ import java.util.concurrent.ConcurrentHashMap
  *
  */
 internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(model) {
-
     companion object {
         private val logger = KotlinLogging.logger {}
         private val separatorRegexpMap = ConcurrentHashMap<String, Regex>()
+
         private fun getTokenizerFactory(language: Locale): TokenizerFactory<CoreLabel> {
             logger.trace { "getting tokenizer for : $language" }
             return when (language.language) {
@@ -47,7 +47,7 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
                     FrenchTokenizer.FrenchTokenizerFactory.newTokenizerFactory()
                         .also {
                             it.setOptions("untokenizable=noneDelete")
-                            //workaround stanford incapacity to disable splitContractionOption
+                            // workaround stanford incapacity to disable splitContractionOption
                             FrenchTokenizer.FrenchTokenizerFactory::class.java.getDeclaredField("splitContractionOption")
                                 .apply {
                                     isAccessible = true
@@ -70,25 +70,29 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
 
     private val tokenizerFactory = getTokenizerFactory(model.language)
 
-    override fun tokenize(context: TokenizerContext, text: String): Array<String> {
-        val rawTokens = tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
-            val word = coreLabel.originalText()
-            splitSeparators(
-                word,
-                model.configuration.tokenizerConfiguration.properties.getProperty("tock_stanford_tokens_separators")
-            )
-        }.let {
-            if (it.isEmpty()) {
-                if (text.trim().isEmpty()) {
-                    emptyList()
+    override fun tokenize(
+        context: TokenizerContext,
+        text: String,
+    ): Array<String> {
+        val rawTokens =
+            tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
+                val word = coreLabel.originalText()
+                splitSeparators(
+                    word,
+                    model.configuration.tokenizerConfiguration.properties.getProperty("tock_stanford_tokens_separators"),
+                )
+            }.let {
+                if (it.isEmpty()) {
+                    if (text.trim().isEmpty()) {
+                        emptyList()
+                    } else {
+                        logger.warn { "empty token list for $text, do not split" }
+                        listOf(text.trim())
+                    }
                 } else {
-                    logger.warn { "empty token list for $text, do not split" }
-                    listOf(text.trim())
+                    it
                 }
-            } else {
-                it
             }
-        }
 
         logger.debug { rawTokens }
 
@@ -98,17 +102,21 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
     private fun separatorRegex(separators: String): Regex =
         separatorRegexpMap.getOrPut(separators) {
             logger.info { "using token separators: $separators" }
-            val s: List<String> = separators
-                .replace("\\,", "_comma_")
-                .split(",")
-                .map { it.replace("_comma_", ",") }
+            val s: List<String> =
+                separators
+                    .replace("\\,", "_comma_")
+                    .split(",")
+                    .map { it.replace("_comma_", ",") }
             s.joinToString("|").toRegex()
         }
 
-    private fun splitSeparators(word: String, separators: String): List<String> {
+    private fun splitSeparators(
+        word: String,
+        separators: String,
+    ): List<String> {
         return try {
             separatorRegex(separators).replace(word) {
-                //if more than one char, than a space between chars to split the whole separator
+                // if more than one char, than a space between chars to split the whole separator
                 it.value.run { if (length == 1) " $this " else toCharArray().joinToString(" ") }
             }
                 .trim()
@@ -119,6 +127,4 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
             listOf(word)
         }
     }
-
-
 }

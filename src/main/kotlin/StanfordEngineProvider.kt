@@ -33,7 +33,6 @@ import ai.tock.nlp.model.service.engine.TokenizerModelHolder
  *
  */
 class StanfordEngineProvider : NlpEngineProvider {
-
     companion object {
         fun getStanfordTokenizer(model: TokenizerModelHolder): Tokenizer {
             return StanfordTokenizer(model)

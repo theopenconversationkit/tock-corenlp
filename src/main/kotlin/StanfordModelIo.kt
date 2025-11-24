@@ -18,12 +18,12 @@
 
 package ai.tock.nlp.stanford
 
+import ai.tock.nlp.model.service.engine.NlpEngineModelIo
+import ai.tock.nlp.model.service.storage.NlpModelStream
 import edu.stanford.nlp.classify.Classifier
 import edu.stanford.nlp.classify.ColumnDataClassifier
 import edu.stanford.nlp.ie.crf.CRFClassifier
 import edu.stanford.nlp.ling.CoreLabel
-import ai.tock.nlp.model.service.engine.NlpEngineModelIo
-import ai.tock.nlp.model.service.storage.NlpModelStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.OutputStream
@@ -32,7 +32,6 @@ import java.io.OutputStream
  *
  */
 internal object StanfordModelIo : NlpEngineModelIo {
-
     override fun loadTokenizerModel(input: NlpModelStream): Any {
         error("loading tokenizer model is not supported")
     }
@@ -44,9 +43,9 @@ internal object StanfordModelIo : NlpEngineModelIo {
             StanfordIntentModel(
                 ColumnDataClassifier(
                     input.configuration?.intentConfiguration?.properties
-                            ?: StanfordModelBuilder.defaultIntentClassifierConfiguration.properties
-                )
-                , classifier
+                        ?: StanfordModelBuilder.defaultIntentClassifierConfiguration.properties,
+                ),
+                classifier,
             )
         }
 
@@ -54,16 +53,22 @@ internal object StanfordModelIo : NlpEngineModelIo {
         input.inputStream.use { stream ->
             CRFClassifier<CoreLabel>(
                 input.configuration?.entityConfiguration?.properties
-                        ?: StanfordModelBuilder.defaultEntityClassifierConfiguration.properties
+                    ?: StanfordModelBuilder.defaultEntityClassifierConfiguration.properties,
             )
                 .apply { loadClassifier(stream) }
         }
 
-    override fun copyTokenizerModel(model: Any, output: OutputStream) {
+    override fun copyTokenizerModel(
+        model: Any,
+        output: OutputStream,
+    ) {
         error("copying tokenizer model is not supported")
     }
 
-    override fun copyIntentModel(model: Any, output: OutputStream) {
+    override fun copyIntentModel(
+        model: Any,
+        output: OutputStream,
+    ) {
         val stanfordModel = model as StanfordIntentModel
         val objectOutputStream = ObjectOutputStream(output)
         objectOutputStream.use {
@@ -71,7 +76,10 @@ internal object StanfordModelIo : NlpEngineModelIo {
         }
     }
 
-    override fun copyEntityModel(model: Any, output: OutputStream) {
+    override fun copyEntityModel(
+        model: Any,
+        output: OutputStream,
+    ) {
         val crfClassifier = model as CRFClassifier<*>
         val objectOutputStream = ObjectOutputStream(output)
         objectOutputStream.use {

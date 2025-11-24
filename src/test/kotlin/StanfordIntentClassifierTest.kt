@@ -14,52 +14,57 @@ import java.util.Locale
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-
 /**
  *
  */
 class StanfordIntentClassifierTest {
-
     private val language = Locale.ENGLISH
-    private val tokenizer = StanfordTokenizer(
-        TokenizerModelHolder(
-            language,
-            StanfordModelBuilder.defaultNlpApplicationConfiguration()
+    private val tokenizer =
+        StanfordTokenizer(
+            TokenizerModelHolder(
+                language,
+                StanfordModelBuilder.defaultNlpApplicationConfiguration(),
+            ),
         )
-    )
 
     @Test
     fun classifyIntent_shouldReturnsAllIntentsAvailable() {
         val dump = IntegrationConfiguration.loadDump(NlpEngineType.stanford)
         with(dump) {
             val sentence = "this is a hard day"
-            val application = Application(
-                application.name,
-                intents.map { definition ->
-                    Intent(
-                        definition.qualifiedName,
-                        definition.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
-                },
-                setOf(language)
-            )
-            val context = IntentContext(application, language, NlpEngineType.stanford)
-            val expressions = sentences.map { s ->
-                s.toSampleExpression(
-                    {
-                        intents.first { intent -> intent._id == s.classification.intentId }
-                            .let { definition ->
-                                Intent(
-                                    definition.qualifiedName,
-                                    definition.entities.map { Entity(EntityType(it.entityTypeName), it.role) })
-                            }
+            val application =
+                Application(
+                    application.name,
+                    intents.map { definition ->
+                        Intent(
+                            definition.qualifiedName,
+                            definition.entities.map { Entity(EntityType(it.entityTypeName), it.role) },
+                        )
                     },
-                    { EntityType(it) }
+                    setOf(language),
                 )
-            }
-            val modelHolder = StanfordModelBuilder.buildIntentModel(
-                context,
-                StanfordModelBuilder.defaultNlpApplicationConfiguration(), expressions
-            )
+            val context = IntentContext(application, language, NlpEngineType.stanford)
+            val expressions =
+                sentences.map { s ->
+                    s.toSampleExpression(
+                        {
+                            intents.first { intent -> intent._id == s.classification.intentId }
+                                .let { definition ->
+                                    Intent(
+                                        definition.qualifiedName,
+                                        definition.entities.map { Entity(EntityType(it.entityTypeName), it.role) },
+                                    )
+                                }
+                        },
+                        { EntityType(it) },
+                    )
+                }
+            val modelHolder =
+                StanfordModelBuilder.buildIntentModel(
+                    context,
+                    StanfordModelBuilder.defaultNlpApplicationConfiguration(),
+                    expressions,
+                )
             val classifier = StanfordIntentClassifier(modelHolder)
             val classification =
                 classifier.classifyIntent(context, sentence, tokenizer.tokenize(TokenizerContext(context), sentence))

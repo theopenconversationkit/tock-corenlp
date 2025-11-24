@@ -35,9 +35,7 @@ import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.ling.CoreLabel
 import mu.KotlinLogging
 
-
 internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityClassifier(model) {
-
     companion object {
         private val logger = KotlinLogging.logger {}
         private val adjacentMarkerRegep = ADJACENT_ENTITY_MARKER.toRegex()
@@ -47,13 +45,13 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
         override val start: Int,
         override val end: Int,
         val text: String,
-        val type: String
+        val type: String,
     ) : IntOpenRange
 
     override fun classifyEntities(
         context: EntityCallContext,
         text: String,
-        tokens: Array<String>
+        tokens: Array<String>,
     ): List<EntityRecognition> {
         return when (context) {
             is EntityCallContextForIntent -> classifyEntities(context, text, tokens)
@@ -65,7 +63,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
     private fun classifyEntities(
         context: EntityCallContextForSubEntities,
         text: String,
-        tokens: Array<String>
+        tokens: Array<String>,
     ): List<EntityRecognition> {
         return classifyEntities(text, tokens) { context.entityType.findSubEntity(it) }
     }
@@ -73,7 +71,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
     private fun classifyEntities(
         context: EntityCallContextForIntent,
         text: String,
-        tokens: Array<String>
+        tokens: Array<String>,
     ): List<EntityRecognition> {
         return classifyEntities(text, tokens) { context.intent.getEntity(it) }
     }
@@ -81,7 +79,7 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
     private fun classifyEntities(
         text: String,
         tokens: Array<String>,
-        entityFinder: (String) -> Entity?
+        entityFinder: (String) -> Entity?,
     ): List<EntityRecognition> {
         return try {
             with(model) {
@@ -144,12 +142,14 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
         }
     }
 
-    private fun getEvaluationData(tokens: Array<String>): String =
-        tokens.joinToString(separator = "") { "$it${TAB}O\n" }
+    private fun getEvaluationData(tokens: Array<String>): String = tokens.joinToString(separator = "") { "$it${TAB}O\n" }
 
-    private fun getConfidence(classifier: CRFClassifier<CoreLabel>, classifiedLabels: List<CoreLabel>): Double {
+    private fun getConfidence(
+        classifier: CRFClassifier<CoreLabel>,
+        classifiedLabels: List<CoreLabel>,
+    ): Double {
         try {
-            //TODO confidence by entity
+            // TODO confidence by entity
             var counter = 0
             var probSum = 0.0
             val cliqueTree = classifier.getCliqueTree(classifiedLabels)
