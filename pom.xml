@@ -26,7 +26,7 @@
         <version>25.10.2</version>
     </parent>
     <groupId>ai.tock</groupId>
-    <version>25.10.2</version>
+    <version>25.10.2-SNAPSHOT</version>
     <artifactId>tock-nlp-model-stanford</artifactId>
     <name>Tock NLP CoreNLP</name>
     <description>Stanford CoreNlp implementation of Tock NLP Model</description>
