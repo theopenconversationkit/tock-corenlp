@@ -35,7 +35,9 @@ import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.ling.CoreLabel
 import mu.KotlinLogging
 
-internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityClassifier(model) {
+internal class StanfordEntityClassifier(
+    model: EntityModelHolder,
+) : NlpEntityClassifier(model) {
     companion object {
         private val logger = KotlinLogging.logger {}
         private val adjacentMarkerRegep = ADJACENT_ENTITY_MARKER.toRegex()
@@ -52,36 +54,31 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
         context: EntityCallContext,
         text: String,
         tokens: Array<String>,
-    ): List<EntityRecognition> {
-        return when (context) {
+    ): List<EntityRecognition> =
+        when (context) {
             is EntityCallContextForIntent -> classifyEntities(context, text, tokens)
             is EntityCallContextForEntity -> error("EntityCallContextForEntity is not supported")
             is EntityCallContextForSubEntities -> classifyEntities(context, text, tokens)
         }
-    }
 
     private fun classifyEntities(
         context: EntityCallContextForSubEntities,
         text: String,
         tokens: Array<String>,
-    ): List<EntityRecognition> {
-        return classifyEntities(text, tokens) { context.entityType.findSubEntity(it) }
-    }
+    ): List<EntityRecognition> = classifyEntities(text, tokens) { context.entityType.findSubEntity(it) }
 
     private fun classifyEntities(
         context: EntityCallContextForIntent,
         text: String,
         tokens: Array<String>,
-    ): List<EntityRecognition> {
-        return classifyEntities(text, tokens) { context.intent.getEntity(it) }
-    }
+    ): List<EntityRecognition> = classifyEntities(text, tokens) { context.intent.getEntity(it) }
 
     private fun classifyEntities(
         text: String,
         tokens: Array<String>,
         entityFinder: (String) -> Entity?,
-    ): List<EntityRecognition> {
-        return try {
+    ): List<EntityRecognition> =
+        try {
             with(model) {
                 @Suppress("UNCHECKED_CAST")
                 val classifier = nativeModel as CRFClassifier<CoreLabel>
@@ -140,7 +137,6 @@ internal class StanfordEntityClassifier(model: EntityModelHolder) : NlpEntityCla
             logger.error("error with $text and ${tokens.contentToString()}", e)
             emptyList()
         }
-    }
 
     private fun getEvaluationData(tokens: Array<String>): String = tokens.joinToString(separator = "") { "$it${TAB}O\n" }
 

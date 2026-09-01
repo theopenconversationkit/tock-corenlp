@@ -50,9 +50,7 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
         context: TokenizerContext,
         configuration: NlpApplicationConfiguration,
         expressions: List<SampleExpression>,
-    ): TokenizerModelHolder {
-        return TokenizerModelHolder(context.language, configuration)
-    }
+    ): TokenizerModelHolder = TokenizerModelHolder(context.language, configuration)
 
     override val defaultEntityClassifierConfiguration: NlpModelConfiguration =
         NlpModelConfiguration(loadProperties("/stanford/crfclassifier.properties"))
@@ -140,8 +138,14 @@ internal object StanfordModelBuilder : NlpEngineModelBuilder {
 
                     val role =
                         when {
-                            entity == null -> "O"
-                            index == 0 -> entity.definition.role
+                            entity == null -> {
+                                "O"
+                            }
+
+                            index == 0 -> {
+                                entity.definition.role
+                            }
+
                             else -> {
                                 // deal with adjacent entities
                                 val alreadyKnown = entityRoleMap[entity]

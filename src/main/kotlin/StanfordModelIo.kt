@@ -54,8 +54,7 @@ internal object StanfordModelIo : NlpEngineModelIo {
             CRFClassifier<CoreLabel>(
                 input.configuration?.entityConfiguration?.properties
                     ?: StanfordModelBuilder.defaultEntityClassifierConfiguration.properties,
-            )
-                .apply { loadClassifier(stream) }
+            ).apply { loadClassifier(stream) }
         }
 
     override fun copyTokenizerModel(

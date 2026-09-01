@@ -35,7 +35,9 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  *
  */
-internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(model) {
+internal class StanfordTokenizer(
+    model: TokenizerModelHolder,
+) : NlpTokenizer(model) {
     companion object {
         private val logger = KotlinLogging.logger {}
         private val separatorRegexpMap = ConcurrentHashMap<String, Regex>()
@@ -44,23 +46,28 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
             logger.trace { "getting tokenizer for : $language" }
             return when (language.language) {
                 "fr" -> {
-                    FrenchTokenizer.FrenchTokenizerFactory.newTokenizerFactory()
+                    FrenchTokenizer.FrenchTokenizerFactory
+                        .newTokenizerFactory()
                         .also {
                             it.setOptions("untokenizable=noneDelete")
                             // workaround stanford incapacity to disable splitContractionOption
-                            FrenchTokenizer.FrenchTokenizerFactory::class.java.getDeclaredField("splitContractionOption")
+                            FrenchTokenizer.FrenchTokenizerFactory::class.java
+                                .getDeclaredField("splitContractionOption")
                                 .apply {
                                     isAccessible = true
                                     set(it, false)
                                 }
                         }
                 }
+
                 "en" -> {
                     PTBTokenizer.PTBTokenizerFactory.newCoreLabelTokenizerFactory("")
                 }
+
                 "es" -> {
                     SpanishTokenizer.SpanishTokenizerFactory.newCoreLabelTokenizerFactory()
                 }
+
                 else -> {
                     PTBTokenizer.PTBTokenizerFactory.newCoreLabelTokenizerFactory("")
                 }
@@ -75,24 +82,28 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
         text: String,
     ): Array<String> {
         val rawTokens =
-            tokenizerFactory.getTokenizer(StringReader(text)).tokenize().flatMap { coreLabel ->
-                val word = coreLabel.originalText()
-                splitSeparators(
-                    word,
-                    model.configuration.tokenizerConfiguration.properties.getProperty("tock_stanford_tokens_separators"),
-                )
-            }.let {
-                if (it.isEmpty()) {
-                    if (text.trim().isEmpty()) {
-                        emptyList()
+            tokenizerFactory
+                .getTokenizer(StringReader(text))
+                .tokenize()
+                .flatMap { coreLabel ->
+                    val word = coreLabel.originalText()
+                    splitSeparators(
+                        word,
+                        model.configuration.tokenizerConfiguration.properties
+                            .getProperty("tock_stanford_tokens_separators"),
+                    )
+                }.let {
+                    if (it.isEmpty()) {
+                        if (text.trim().isEmpty()) {
+                            emptyList()
+                        } else {
+                            logger.warn { "empty token list for $text, do not split" }
+                            listOf(text.trim())
+                        }
                     } else {
-                        logger.warn { "empty token list for $text, do not split" }
-                        listOf(text.trim())
+                        it
                     }
-                } else {
-                    it
                 }
-            }
 
         logger.debug { rawTokens }
 
@@ -113,18 +124,17 @@ internal class StanfordTokenizer(model: TokenizerModelHolder) : NlpTokenizer(mod
     private fun splitSeparators(
         word: String,
         separators: String,
-    ): List<String> {
-        return try {
-            separatorRegex(separators).replace(word) {
-                // if more than one char, than a space between chars to split the whole separator
-                it.value.run { if (length == 1) " $this " else toCharArray().joinToString(" ") }
-            }
-                .trim()
+    ): List<String> =
+        try {
+            separatorRegex(separators)
+                .replace(word) {
+                    // if more than one char, than a space between chars to split the whole separator
+                    it.value.run { if (length == 1) " $this " else toCharArray().joinToString(" ") }
+                }.trim()
                 .split(" ")
                 .toList()
         } catch (e: Exception) {
             logger.error(e)
             listOf(word)
         }
-    }
 }

@@ -34,24 +34,16 @@ import ai.tock.nlp.model.service.engine.TokenizerModelHolder
  */
 class StanfordEngineProvider : NlpEngineProvider {
     companion object {
-        fun getStanfordTokenizer(model: TokenizerModelHolder): Tokenizer {
-            return StanfordTokenizer(model)
-        }
+        fun getStanfordTokenizer(model: TokenizerModelHolder): Tokenizer = StanfordTokenizer(model)
     }
 
     override val type: NlpEngineType = NlpEngineType.stanford
 
-    override fun getIntentClassifier(model: IntentModelHolder): IntentClassifier {
-        return StanfordIntentClassifier(model)
-    }
+    override fun getIntentClassifier(model: IntentModelHolder): IntentClassifier = StanfordIntentClassifier(model)
 
-    override fun getEntityClassifier(model: EntityModelHolder): EntityClassifier {
-        return StanfordEntityClassifier(model)
-    }
+    override fun getEntityClassifier(model: EntityModelHolder): EntityClassifier = StanfordEntityClassifier(model)
 
-    override fun getTokenizer(model: TokenizerModelHolder): Tokenizer {
-        return getStanfordTokenizer(model)
-    }
+    override fun getTokenizer(model: TokenizerModelHolder): Tokenizer = getStanfordTokenizer(model)
 
     override val modelBuilder: NlpEngineModelBuilder = StanfordModelBuilder
 

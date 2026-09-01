@@ -28,7 +28,9 @@ import edu.stanford.nlp.stats.Counters
 /**
  *
  */
-internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentClassifier(model) {
+internal class StanfordIntentClassifier(
+    model: IntentModelHolder,
+) : NlpIntentClassifier(model) {
     companion object {
         val emptyClassification =
             object : IntentClassification {
@@ -59,12 +61,11 @@ internal class StanfordIntentClassifier(model: IntentModelHolder) : NlpIntentCla
 
                         override fun hasNext(): Boolean = iterator.hasNext()
 
-                        override fun next(): Intent {
-                            return iterator.next().let { (key, proba) ->
+                        override fun next(): Intent =
+                            iterator.next().let { (key, proba) ->
                                 probability = Math.exp(proba - logSum)
                                 application.getIntent(key) ?: Intent.UNKNOWN_INTENT
                             }
-                        }
                     }
                 }
             } else {

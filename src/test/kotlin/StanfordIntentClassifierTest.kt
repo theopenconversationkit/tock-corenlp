@@ -48,7 +48,8 @@ class StanfordIntentClassifierTest {
                 sentences.map { s ->
                     s.toSampleExpression(
                         {
-                            intents.first { intent -> intent._id == s.classification.intentId }
+                            intents
+                                .first { intent -> intent._id == s.classification.intentId }
                                 .let { definition ->
                                     Intent(
                                         definition.qualifiedName,
