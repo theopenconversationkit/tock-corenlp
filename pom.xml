@@ -47,6 +47,19 @@
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
             <version>${stanford}</version>
+            <exclusions>
+                <!-- Legacy XML parser brought by xom: it replaces the JDK parser for the whole JVM
+                     and does not support the secure processing attributes set by OpenNLP or Jackson.
+                     xom falls back to the JDK parser. -->
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
